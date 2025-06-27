@@ -43,3 +43,20 @@ void decimal_to_base4(char* decimal, char* converted) {
     }
     *converted = NULL_TERMINATOR;
 }
+
+
+/**
+ * This function receives a data
+ * stream read from a file and
+ * returns the size of the stream/
+ * content in bytes.
+ */
+long file_content_size(FILE* fp) {
+    long content_size;
+
+    fseek(fp, 0, SEEK_END);
+    content_size = ftell(fp);
+    rewind(fp);
+
+    return content_size;
+}
