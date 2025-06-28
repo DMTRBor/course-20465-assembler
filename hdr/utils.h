@@ -1,6 +1,11 @@
 #ifndef __UTILS__H__
 #define __UTILS__H__
 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <math.h>
+
 #define MAX_FNAME_LEN 50
 #define MIN_ALLOWED_ARGS 2
 
