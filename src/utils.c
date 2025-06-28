@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "../inc/utils.h"
+#include "../hdr/utils.h"
 
 
 /**

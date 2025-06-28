@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "../inc/utils.h"
+#include "../hdr/utils.h"
 
 
 /**
@@ -40,7 +40,8 @@ int main(int argc, char *argv[])
             continue;
         }
         /* file is valid - start processing */
-        printf("here goes the processing part\n");
+        fprintf(stdout, "Processing file: %s\n", filename);
+        /* processing ... */
         fclose(fp);  /* close the file */
     }
 
