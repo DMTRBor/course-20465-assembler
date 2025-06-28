@@ -56,7 +56,7 @@ long file_content_size(FILE* fp) {
 
     fseek(fp, 0, SEEK_END);
     content_size = ftell(fp);
-    rewind(fp);
+    rewind(fp);  /* return to start of the file */
 
     return content_size;
 }
