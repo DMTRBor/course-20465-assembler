@@ -66,13 +66,13 @@ char* get_macro_name(char *line) {
  * This function
  */
 int parse_assembler_source(FILE *fp, char *filename) {
+    int inside_macro = FALSE;  /* macro flag */
     char macro_filename[MAX_FNAME_LEN];
     Line *curr_line;
     Line *first_line;
     Macro *macro_curr_line;
     Macro *macro_first_line;
     LineArg line_arg_type;
-    int inside_macro = FALSE;  /* macro flag */
 
     /* create file lines structured list, point to first line */
     curr_line = file_to_list(fp);
@@ -146,10 +146,7 @@ int parse_assembler_source(FILE *fp, char *filename) {
     }
 
     /* finish - close file and free used memory */
-    free_list(curr_line);
     free_list(first_line);
-
-    free_macro(macro_curr_line);
     free_macro(macro_first_line);
 
     fclose(fp);
