@@ -3,55 +3,42 @@
 
 /* -------------------------- Lines -------------------------- */
 
-Line* add_new_line(char *line, int line_number) {
+Line* new_line(char *line) {
     Line *new_line = malloc(sizeof(Line));
     /* check if allocated properly */
     if (new_line == NULL)
         return NULL;
 
     new_line->line = strdup(line);  /* copy line */
-    new_line->line_number = line_number;
     new_line->next = NULL;
     return new_line;
 }
 
 
-void delete_line(Line *start, int line_number) {
-    Line *curr = start, *prev = NULL;
+void delete_line_from_list(Line *curr) {
+    /* last line will not be deleted */
+    if (curr == NULL || curr->next == NULL)
+        return;
 
-    while (curr != NULL) {
-        if (curr->line_number == line_number) {
-            if (prev != NULL)
-                prev->next = curr->next;
-            else
-                start = curr->next;
+    Line *temp = curr->next;
 
-            free(curr->line);
-            free(curr);
-            break;
-        }
-        prev = curr;
-        curr = curr->next;
-    }
+    /* copy next line's data into current ptr */
+    free(curr->line);
+    curr->line = strdup(temp->line);
+    curr->next = temp->next;
 
-    return start;
+    /* free redundant next node */
+    free(temp->line);
+    free(temp);
 }
 
 
-Line* insert_in_list(Line *start, int start_line, char *line_content) {
-    Line *curr = start;
+void insert_line_in_list(Line *prev, Line *new) {
+    if (prev == NULL || new == NULL)
+        return;
 
-    while (curr != NULL) {
-        if (curr->line_number == start_line) {
-            Line *new_line = add_new_line(line_content, start_line + 1);
-            new_line->next = curr->next;
-            curr->next = new_line;
-            break;
-        }
-        curr = curr->next;
-    }
-
-    return start;
+    new->next = prev->next;
+    prev->next = new;
 }
 
 
@@ -68,20 +55,20 @@ void free_list(Line *start) {
 Line* file_to_list(FILE *fp) {
     Line *start = NULL, *end = NULL;
     char line[MAX_LINE_LEN];
-    int line_number = 1;
+    int line_number = 1;  /* initialize line number */
 
     while (fgets(line, sizeof(line), fp) != NULL) {
         if (line_too_long(line, fp))
             return NULL;
 
         line[strcspn(line, NEWLINE_STR)] = NULL_TERMINATOR;
-        Line *new_line = add_new_line(line, line_number++);
+        Line *new = new_line(line, line_number++);
 
         if (start == NULL)
-            start = end = new_line;
+            start = end = new;
         else {
-            end->next = new_line;
-            end = new_line;
+            end->next = new;
+            end = new;
         }
     }
 
@@ -90,17 +77,20 @@ Line* file_to_list(FILE *fp) {
 
 
 int list_to_file(Line *start, FILE *fp) {
+    int line_number = 1;  /* initialize line number */
+    
     if (fp == NULL)
-        return 0;
+        return STATUS_CODE_ERR;
 
     while (start != NULL) {
         /* write line to file stream */
         /* negative value indicates writing failed */
         if (fprintf(fp, "%s\n", start->line) < 0) {
-            fprintf(stderr, "Error writing to file at line %d\n", start->line_number);
+            fprintf(stderr, "Error writing to file at line %d\n", line_number);
             return STATUS_CODE_ERR;
         }
         start = start->next;
+        line_number++;
     }
 
     return STATUS_CODE_OK;
@@ -135,8 +125,8 @@ void add_line_to_macro(Macro *mcro, Line *line) {
 }
 
 
-void free_macro(Macro *m) {
-    Line *curr = m->line;
+void free_macro(Macro *mcro) {
+    Line *curr = mcro->line;
 
     while (curr != NULL) {
         Line *tmp = curr;
@@ -145,6 +135,6 @@ void free_macro(Macro *m) {
         free(tmp);
     }
 
-    free(m->name);
-    free(m);
+    free(mcro->name);
+    free(mcro);
 }

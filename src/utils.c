@@ -98,5 +98,5 @@ int line_too_long(char *line, FILE *fp) {
 
     /* newline not found at the end of the
        line and not reached EOF */
-    return (line[line_length] != NEWLINE_CHAR && feof(fp) == FALSE);
+    return (line[line_length] != NEWLINE_CHAR && !feof(fp));
 }

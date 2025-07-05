@@ -67,23 +67,25 @@ char* get_macro_name(char *line) {
  */
 int parse_assembler_source(FILE *fp, char *filename) {
     char macro_filename[MAX_FNAME_LEN];
-    Line *lines_list;
-    Macro *macro_list;
+    Line *curr_line, *first_line;
+    Macro *macro_curr_line, *macro_first_line;
     LineArg line_arg_type;
     int inside_macro = FALSE;  /* macro flag */
 
-    /* create file lines structured list */
-    lines_list = file_to_list(fp);
+    /* create file lines structured list, point to first line */
+    curr_line = file_to_list(fp);
+    /* point to first line in file */
+    first_line = curr_line;
     /* error - line too long/memory misallocation */
-    if (lines_list == NULL) {
+    if (curr_line == NULL) {
         fclose(fp);
         return STATUS_CODE_ERR;
     }
     fclose(fp);
 
     /* process assembler file lines */
-    while (lines_list != NULL) {
-        line_arg_type = parse_line(lines_list->line);
+    while (curr_line != NULL) {
+        line_arg_type = parse_line(curr_line->line);
 
         switch (line_arg_type) {
             case EMPTY_LINE:
@@ -91,23 +93,39 @@ int parse_assembler_source(FILE *fp, char *filename) {
                 break;  /* ignore these lines */
             case MCRO:
                 inside_macro = TRUE;
-                macro_list = init_macro_list(get_macro_name(lines_list->line));
+                macro_curr_line = init_macro_list(get_macro_name(curr_line->line));
+                macro_first_line = macro_curr_line;
+                delete_line_from_list(curr_line->line);
+                curr_line = curr_line->next;
                 break;
             case MCROEND:
                 inside_macro = FALSE;
+                delete_line_from_list(curr_line->line);
                 break;
         }
 
-        /* encountered mcroend */
-        if (macro_list != NULL) {
-            if (inside_macro)  /* inside macro */
-                add_line_to_macro(macro_list, lines_list);    
+        /* store macro lines in macro list */
+        if (macro_curr_line != NULL && inside_macro) {
+            add_line_to_macro(macro_curr_line, curr_line);
+            delete_line_from_list(curr_line->line);
+        }
 
-            delete_line();
+        /* found macro call */
+        if (macro_curr_line != NULL && (!inside_macro) && strcmp(curr_line->line, macro_curr_line->name)) {
+            /* clear macro label */
+            curr_line->line = NULL;
+
+            /* insert macro lines where called */
+            while (macro_first_line->line != NULL) {
+                /* insert macro line into the list */
+                insert_line_in_list(curr_line, macro_curr_line->line);
+                /* move to next line in macro */
+                macro_curr_line->line = macro_curr_line->line->next;
+            }
         }
 
         /* go to next line */
-        lines_list = lines_list->next;
+        curr_line = curr_line->next;
     }
 
     /* add macro-parsed file extension */
@@ -120,13 +138,19 @@ int parse_assembler_source(FILE *fp, char *filename) {
         return STATUS_CODE_ERR;
     }
 
-    if(list_to_file(lines_list, fp) == STATUS_CODE_ERR) {
+    if(list_to_file(first_line, fp) == STATUS_CODE_ERR) {
         fclose(fp);
         return STATUS_CODE_ERR;
     }
 
     /* finish - close file and free used memory */
-    free_list(lines_list);
+    free_list(curr_line);
+    free_list(first_line);
+
+    free_macro(macro_curr_line);
+    free_macro(macro_first_line);
+
     fclose(fp);
+
     return STATUS_CODE_OK;
 }

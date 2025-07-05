@@ -11,7 +11,6 @@
 /* a node will represent a line in file */
 typedef struct Node {
     char *line;
-    int line_number;
     struct Node *next;
 } Node;
 
@@ -23,12 +22,13 @@ typedef struct Macro {
 } Macro;
 
 /* line */
-Line* add_new_line(char *, int);
-void delete_line(Line *, int);
-Line* insert_in_list(Line *, int, char *);
+Line* new_line(char *);
+void delete_line_from_list(Line *);
+void insert_line_in_list(Line *, Line *);
 void free_list(Line *);
 Line* file_to_list(FILE *);
 int list_to_file(Line *, FILE *);
+
 /* macro */
 Macro* init_macro_list(char *);
 void add_line_to_macro(Macro *, Line *);
