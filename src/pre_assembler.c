@@ -67,8 +67,10 @@ char* get_macro_name(char *line) {
  */
 int parse_assembler_source(FILE *fp, char *filename) {
     char macro_filename[MAX_FNAME_LEN];
-    Line *curr_line, *first_line;
-    Macro *macro_curr_line, *macro_first_line;
+    Line *curr_line;
+    Line *first_line;
+    Macro *macro_curr_line;
+    Macro *macro_first_line;
     LineArg line_arg_type;
     int inside_macro = FALSE;  /* macro flag */
 
@@ -95,23 +97,23 @@ int parse_assembler_source(FILE *fp, char *filename) {
                 inside_macro = TRUE;
                 macro_curr_line = init_macro_list(get_macro_name(curr_line->line));
                 macro_first_line = macro_curr_line;
-                delete_line_from_list(curr_line->line);
+                delete_line_from_list(curr_line);
                 curr_line = curr_line->next;
                 break;
             case MCROEND:
                 inside_macro = FALSE;
-                delete_line_from_list(curr_line->line);
+                delete_line_from_list(curr_line);
                 break;
         }
 
         /* store macro lines in macro list */
         if (macro_curr_line != NULL && inside_macro) {
             add_line_to_macro(macro_curr_line, curr_line);
-            delete_line_from_list(curr_line->line);
+            delete_line_from_list(curr_line);
         }
 
         /* found macro call */
-        if (macro_curr_line != NULL && (!inside_macro) && strcmp(curr_line->line, macro_curr_line->name)) {
+        if (macro_curr_line != NULL && (!inside_macro) && (!strcmp(curr_line->line, macro_curr_line->name))) {
             /* clear macro label */
             curr_line->line = NULL;
 

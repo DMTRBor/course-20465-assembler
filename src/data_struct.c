@@ -55,14 +55,13 @@ void free_list(Line *start) {
 Line* file_to_list(FILE *fp) {
     Line *start = NULL, *end = NULL;
     char line[MAX_LINE_LEN];
-    int line_number = 1;  /* initialize line number */
 
     while (fgets(line, sizeof(line), fp) != NULL) {
         if (line_too_long(line, fp))
             return NULL;
 
         line[strcspn(line, NEWLINE_STR)] = NULL_TERMINATOR;
-        Line *new = new_line(line, line_number++);
+        Line *new = new_line(line);
 
         if (start == NULL)
             start = end = new;
