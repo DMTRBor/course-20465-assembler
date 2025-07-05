@@ -1,4 +1,4 @@
-#include "../hdr/utils.h"
+#include "../hdr/pre_assembler.h"
 
 
 /**
@@ -25,20 +25,24 @@ int main(int argc, char *argv[])
         strcat(filename, ASMB_FILE_EXTEN);
 
         /* file doesn't exist or it's restricted for reading */
-        if ((fp = fopen(filename, READ_FILE_PERMISSION)) == NULL) {
-            fprintf(stderr, "Can't read from file - %s\n", filename);
+        if ((fp = open_file(filename, READ_FILE_PERMISSION)) == NULL)
             continue;
-        }
+
         /* empty file */
         else if (file_content_size(fp) == 0) {
             fprintf(stderr, "File is empty: %s\n", filename);
             fclose(fp);  /* close the file */
             continue;
         }
+
         /* file is valid - start processing */
         fprintf(stdout, "Processing file: %s\n", filename);
-        /* processing ... */
-        fclose(fp);  /* close the file */
+
+        /* pre-assembler */
+        if (parse_assembler_source(fp, argv[arg_id]) == STATUS_CODE_OK) {
+            /* first pass */
+            printf("Here goes first pass...\n");
+        }
     }
 
     /* no critical errors occured during run */

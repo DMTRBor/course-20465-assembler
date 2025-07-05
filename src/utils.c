@@ -8,7 +8,7 @@
  * and places the converted string representation of
  * the number in base 4 in an empty string.
  */
-void decimal_to_base4(char* decimal, char* converted) {
+void decimal_to_base4(char *decimal, char *converted) {
     /* temporary converted number storage */
     char temp[sizeof(converted) / sizeof(char)];
     int decimal_num = 0;
@@ -55,4 +55,48 @@ long file_content_size(FILE* fp) {
     rewind(fp);  /* return to start of the file */
 
     return content_size;
+}
+
+
+/**
+ * This function receives a string
+ * that represents a filename, opens
+ * the file for reading and returns a
+ * pointer to file if succeeded in
+ * reading the content. If failed to
+ * read from file (not exitent, permission),
+ * the function returns null.
+ */
+FILE* open_file(char *filename, char *permission) {
+    FILE *fp = fopen(filename, permission);
+
+    if (fp == NULL) {
+        fprintf(stderr, "Can't open file - %s\n", filename);
+        fclose(fp);
+        return NULL;
+    }
+
+    return fp;
+}
+
+
+/**
+ * This function gets a pointer to a
+ * line read from file, that has a
+ * pre-defined maximum length and a
+ * pointer to a file stream and checks
+ * if the line is too long (if newline
+ * is not found in characters, the line
+ * is longer than expected). The function
+ * returns TRUE code if the line is too
+ * long and FALSE code otherwise.
+ */
+int line_too_long(char *line, FILE *fp) {
+    /* count line characters until
+       newline (if exists) */
+    size_t line_length = strcspn(line, NEWLINE_STR);
+
+    /* newline not found at the end of the
+       line and not reached EOF */
+    return (line[line_length] != NEWLINE_CHAR && feof(fp) == FALSE);
 }
