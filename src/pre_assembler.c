@@ -4,29 +4,61 @@
 LineArg parse_line(char *line) {
     char *line_args;
     char *line_copy;
+    LineArg line_arg_type = OTHER;
+
     /* copy line for processing */
     line_copy = strdup(line);
     /* tokenize with whitespaces */
     line_args = strtok(line_copy, WHITESPACE);
 
     while (line_args != NULL) {
-        if (strcmp(line_args, NEWLINE_STR) == STR_EQUAL)
-            return EMPTY_LINE;
-
-        if (strcmp(line_args, COMMENT_SIGN) == STR_EQUAL)
-            return COMMENT;
-
-        if (strcmp(line_args, MACRO_START) == STR_EQUAL)
-            return MCRO;
-
-        if (strcmp(line_args, MACRO_END) == STR_EQUAL)
-            return MCROEND;
-
+        if (strcmp(line_args, NEWLINE_STR) == STR_EQUAL) {
+            line_arg_type = EMPTY_LINE;
+            break;
+        }
+        if (strcmp(line_args, COMMENT_SIGN) == STR_EQUAL) {
+            line_arg_type = COMMENT;
+            break;
+        }
+        if (strcmp(line_args, MACRO_START) == STR_EQUAL) {
+            line_arg_type = MCRO;
+            break;
+        }
+        if (strcmp(line_args, MACRO_END) == STR_EQUAL) {
+            line_arg_type = MCROEND;
+            break;
+        }
+        /* next token/arg */
         line_args = strtok(NULL, WHITESPACE);
     }
 
     free(line_copy);
-    return OTHER;
+    return line_arg_type;
+}
+
+
+char* get_macro_name(char *line) {
+    char *line_args;
+    char *line_copy;
+    int arg_id = 0;  /* token index */
+
+    /* copy line for processing */
+    line_copy = strdup(line);
+    /* tokenize with whitespaces */
+    line_args = strtok(line_copy, WHITESPACE);
+
+    while (line_args != NULL) {
+        /* macro name goes after mcro label */
+        if (arg_id == 1)
+            break;
+
+        /* next token/arg */
+        line_args = strtok(NULL, WHITESPACE);
+        arg_id++;
+    }
+
+    free(line_copy);
+    return line_args;
 }
 
 
@@ -38,6 +70,7 @@ int parse_assembler_source(FILE *fp, char *filename) {
     Line *lines_list;
     Macro *macro_list;
     LineArg line_arg_type;
+    int inside_macro = FALSE;  /* macro flag */
 
     /* create file lines structured list */
     lines_list = file_to_list(fp);
@@ -57,9 +90,20 @@ int parse_assembler_source(FILE *fp, char *filename) {
             case COMMENT:
                 break;  /* ignore these lines */
             case MCRO:
+                inside_macro = TRUE;
+                macro_list = init_macro_list(get_macro_name(lines_list->line));
                 break;
             case MCROEND:
+                inside_macro = FALSE;
                 break;
+        }
+
+        /* encountered mcroend */
+        if (macro_list != NULL) {
+            if (inside_macro)  /* inside macro */
+                add_line_to_macro(macro_list, lines_list);    
+
+            delete_line();
         }
 
         /* go to next line */

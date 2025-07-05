@@ -22,5 +22,7 @@ typedef enum {
 
 
 int parse_assembler_source(FILE *, char *);
+LineArg parse_line(char *);
+char* get_macro_name(char *);
 
 #endif

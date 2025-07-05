@@ -22,12 +22,16 @@ typedef struct Macro {
     Line *line;
 } Macro;
 
-
+/* line */
 Line* add_new_line(char *, int);
 void delete_line(Line *, int);
 Line* insert_in_list(Line *, int, char *);
 void free_list(Line *);
 Line* file_to_list(FILE *);
 int list_to_file(Line *, FILE *);
+/* macro */
+Macro* init_macro_list(char *);
+void add_line_to_macro(Macro *, Line *);
+void free_macro(Macro *);
 
 #endif

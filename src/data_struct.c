@@ -108,7 +108,7 @@ int list_to_file(Line *start, FILE *fp) {
 
 /* -------------------------- Macro -------------------------- */
 
-Macro* new_macro(char *mcro_name) {
+Macro* init_macro_list(char *mcro_name) {
     Macro *mcro = malloc(sizeof(Macro));
     /* check if allocated properly */
     if (mcro == NULL)
