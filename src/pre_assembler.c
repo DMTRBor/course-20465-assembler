@@ -132,18 +132,8 @@ int parse_assembler_source(FILE *fp, char *filename) {
         }
 
         /* found macro call */
-        if (macro_curr_line != NULL && (!inside_macro) && is_macro_call(curr_line->line, macro_curr_line->name)) {
-            /* clear macro label */
-            curr_line->line = NULL;
-
-            /* insert macro lines where called */
-            while (macro_curr_line->line != NULL) {
-                /* insert macro line into the list */
-                insert_line_in_list(curr_line, macro_curr_line->line);
-                /* move to next line in macro */
-                macro_curr_line->line = macro_curr_line->line->next;
-            }
-        }
+        if (macro_curr_line != NULL && (!inside_macro) && is_macro_call(curr_line->line, macro_curr_line->name))
+            insert_macro_in_list(curr_line, macro_curr_line);
 
         /* go to next line */
         curr_line = curr_line->next;
@@ -154,7 +144,7 @@ int parse_assembler_source(FILE *fp, char *filename) {
     strcat(macro_filename, ASMB_MCRO_FILE_EXTEN);
 
     /* write list to file after macros expansion */
-    if ((fp = open_file(filename, WRITE_FILE_PERMISSION)) == NULL) {
+    if ((fp = open_file(macro_filename, WRITE_FILE_PERMISSION)) == NULL) {
         fclose(fp);
         return STATUS_CODE_ERR;
     }
@@ -164,10 +154,9 @@ int parse_assembler_source(FILE *fp, char *filename) {
         return STATUS_CODE_ERR;
     }
 
-    /* finish - close file and free used memory */
+    /* free used memory */
     free_list(first_line);
-    free_macro(macro_curr_line);
-
+    /* close file */
     fclose(fp);
 
     return STATUS_CODE_OK;

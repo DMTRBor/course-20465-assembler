@@ -24,7 +24,6 @@ typedef struct Macro {
 /* line */
 Line* new_line(char *);
 void delete_line_from_list(Line *);
-void insert_line_in_list(Line *, Line *);
 void free_list(Line *);
 Line* file_to_list(FILE *);
 int list_to_file(Line *, FILE *);
@@ -32,6 +31,7 @@ int list_to_file(Line *, FILE *);
 /* macro */
 Macro* init_macro_list(char *);
 void add_line_to_macro(Macro *, Line *);
+void insert_macro_in_list(Line *, Macro *);
 void free_macro(Macro *);
 
 #endif

@@ -33,15 +33,6 @@ void delete_line_from_list(Line *curr) {
 }
 
 
-void insert_line_in_list(Line *prev, Line *new) {
-    if (prev == NULL || new == NULL)
-        return;
-
-    new->next = prev->next;
-    prev->next = new;
-}
-
-
 void free_list(Line *start) {
     while (start != NULL) {
         Line *temp = start;
@@ -137,14 +128,42 @@ void add_line_to_macro(Macro *mcro, Line *line) {
 }
 
 
+void insert_macro_in_list(Line *line, Macro *macro) {
+    if (line == NULL || macro == NULL || macro->line == NULL)
+        return;
+
+    Line *macro_head = macro->line;
+    Line *macro_tail = macro_head;
+
+    /* find last line in macro */
+    while (macro_tail->next)
+        macro_tail = macro_tail->next;
+
+    /* replace macro label line in
+       list with first macro line */
+    free(line->line);
+    line->line = strdup(macro_head->line);
+
+    /* insert the rest of the macro
+       lines after target */
+    macro_tail->next = line->next;
+    line->next = macro_head->next;
+
+    /* macro first line already copied
+       instead of label */
+    free(macro_head->line);
+    free(macro_head);
+}
+
+
 void free_macro(Macro *mcro) {
     Line *curr = mcro->line;
 
     while (curr != NULL) {
-        Line *tmp = curr;
+        Line *temp = curr;
         curr = curr->next;
-        free(tmp->line);
-        free(tmp);
+        free(temp->line);
+        free(temp);
     }
 
     free(mcro->name);
