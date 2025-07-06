@@ -31,6 +31,7 @@ int list_to_file(Line *, FILE *);
 /* macro */
 Macro* init_macro_list(char *);
 void add_line_to_macro(Macro *, Line *);
+Line *copy_macro_lines(Line *);
 void insert_macro_in_list(Line *, Macro *);
 void free_macro(Macro *);
 

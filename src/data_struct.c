@@ -128,12 +128,46 @@ void add_line_to_macro(Macro *mcro, Line *line) {
 }
 
 
+Line *copy_macro_lines(Line *origin_lines) {
+    if (origin_lines == NULL)
+        return NULL;
+
+    Line *copy_head = NULL, *copy_tail = NULL;
+
+    while (origin_lines != NULL) {
+        Line *new_line = malloc(sizeof(Line));
+        /* check if allocated properly */
+        if (new_line == NULL)
+            return NULL;
+
+        new_line->line = strdup(origin_lines->line);
+        new_line->next = NULL;
+
+        if (copy_head == NULL)
+            copy_head = copy_tail = new_line;
+        else {
+            copy_tail->next = new_line;
+            copy_tail = new_line;
+        }
+
+        origin_lines = origin_lines->next;
+    }
+
+    return copy_head;
+}
+
+
 void insert_macro_in_list(Line *line, Macro *macro) {
     if (line == NULL || macro == NULL || macro->line == NULL)
         return;
 
-    Line *macro_head = macro->line;
-    Line *macro_tail = macro_head;
+    /* use copy of macro for reusal in repeated calls */
+    Line *macro_copy = copy_macro_lines(macro->line);
+    /* validate copying */
+    if (macro_copy == NULL)
+        return;
+
+    Line *macro_tail = macro_copy;
 
     /* find last line in macro */
     while (macro_tail->next)
@@ -142,17 +176,17 @@ void insert_macro_in_list(Line *line, Macro *macro) {
     /* replace macro label line in
        list with first macro line */
     free(line->line);
-    line->line = strdup(macro_head->line);
+    line->line = strdup(macro_copy->line);
 
     /* insert the rest of the macro
        lines after target */
     macro_tail->next = line->next;
-    line->next = macro_head->next;
+    line->next = macro_copy->next;
 
     /* macro first line already copied
        instead of label */
-    free(macro_head->line);
-    free(macro_head);
+    free(macro_copy->line);
+    free(macro_copy);
 }
 
 
