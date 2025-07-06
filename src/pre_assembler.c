@@ -65,7 +65,7 @@ int is_macro_call(char *line, char *macro_name) {
     /* copy line for processing */
     line_copy = strdup(line);
     /* tokenize with whitespaces */
-    line_args = strtok(line, WHITESPACE);
+    line_args = strtok(line_copy, WHITESPACE);
 
     while (line_args != NULL) {
         /* macro called */
