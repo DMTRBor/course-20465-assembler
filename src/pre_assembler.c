@@ -39,13 +39,10 @@ LineArg parse_line(char *line) {
 
 char* get_macro_name(char *line) {
     char *line_args;
-    char *line_copy;
     int arg_id = 0;  /* token index */
 
-    /* copy line for processing */
-    line_copy = strdup(line);
     /* tokenize with whitespaces */
-    line_args = strtok(line_copy, WHITESPACE);
+    line_args = strtok(line, WHITESPACE);
 
     while (line_args != NULL) {
         /* macro name goes after mcro label */
@@ -57,8 +54,32 @@ char* get_macro_name(char *line) {
         arg_id++;
     }
 
-    free(line_copy);
     return line_args;
+}
+
+
+int is_macro_call(char *line, char *macro_name) {
+    char *line_args;
+    char *line_copy;
+
+    /* copy line for processing */
+    line_copy = strdup(line);
+    /* tokenize with whitespaces */
+    line_args = strtok(line, WHITESPACE);
+
+    while (line_args != NULL) {
+        /* macro called */
+        if (strcmp(line_args, macro_name) == STR_EQUAL) {
+            free(line_copy);
+            return TRUE;
+        }
+
+        /* next token/arg */
+        line_args = strtok(NULL, WHITESPACE);
+    }
+
+    free(line_copy);
+    return FALSE;
 }
 
 
@@ -67,12 +88,11 @@ char* get_macro_name(char *line) {
  */
 int parse_assembler_source(FILE *fp, char *filename) {
     int inside_macro = FALSE;  /* macro flag */
+    LineArg line_arg_type = OTHER;
     char macro_filename[MAX_FNAME_LEN];
-    Line *curr_line;
-    Line *first_line;
-    Macro *macro_curr_line;
-    Macro *macro_first_line;
-    LineArg line_arg_type;
+    Line *curr_line = NULL;
+    Line *first_line = NULL;
+    Macro *macro_curr_line = NULL;
 
     /* create file lines structured list, point to first line */
     curr_line = file_to_list(fp);
@@ -96,9 +116,7 @@ int parse_assembler_source(FILE *fp, char *filename) {
             case MCRO:
                 inside_macro = TRUE;
                 macro_curr_line = init_macro_list(get_macro_name(curr_line->line));
-                macro_first_line = macro_curr_line;
                 delete_line_from_list(curr_line);
-                curr_line = curr_line->next;
                 break;
             case MCROEND:
                 inside_macro = FALSE;
@@ -110,15 +128,16 @@ int parse_assembler_source(FILE *fp, char *filename) {
         if (macro_curr_line != NULL && inside_macro) {
             add_line_to_macro(macro_curr_line, curr_line);
             delete_line_from_list(curr_line);
+            continue;
         }
 
         /* found macro call */
-        if (macro_curr_line != NULL && (!inside_macro) && (!strcmp(curr_line->line, macro_curr_line->name))) {
+        if (macro_curr_line != NULL && (!inside_macro) && is_macro_call(curr_line->line, macro_curr_line->name)) {
             /* clear macro label */
             curr_line->line = NULL;
 
             /* insert macro lines where called */
-            while (macro_first_line->line != NULL) {
+            while (macro_curr_line->line != NULL) {
                 /* insert macro line into the list */
                 insert_line_in_list(curr_line, macro_curr_line->line);
                 /* move to next line in macro */
@@ -147,7 +166,7 @@ int parse_assembler_source(FILE *fp, char *filename) {
 
     /* finish - close file and free used memory */
     free_list(first_line);
-    free_macro(macro_first_line);
+    free_macro(macro_curr_line);
 
     fclose(fp);
 

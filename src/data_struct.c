@@ -111,15 +111,28 @@ Macro* init_macro_list(char *mcro_name) {
 
 
 void add_line_to_macro(Macro *mcro, Line *line) {
+    /* allocate line for copy */
+    Line *new_line = malloc(sizeof(Line));
+    /* check if allocated properly */
+    if (new_line == NULL)
+        return;
+
+    /* copy line content */
+    new_line->line = strdup(line->line);
+    new_line->next = NULL;
+
+    /* add line to macro list */
     if (mcro->line == NULL)
-        mcro->line = line;
+        mcro->line = new_line;
     else {
+        /* traverse to the end and append */
         Line *curr = mcro->line;
 
-        while (curr->next)
+        while (curr->next != NULL) {
             curr = curr->next;
+        }
 
-        curr->next = line;
+        curr->next = new_line;
     }
 }
 
