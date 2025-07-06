@@ -48,8 +48,10 @@ Line* file_to_list(FILE *fp) {
     char line[MAX_LINE_LEN];
 
     while (fgets(line, sizeof(line), fp) != NULL) {
-        if (line_too_long(line, fp))
+        if (line_too_long(line, fp)) {
+            fprintf(stderr, "Line too long in file, max length is %d characters\n", MAX_LINE_LEN - 1);
             return NULL;
+        }
 
         line[strcspn(line, NEWLINE_STR)] = NULL_TERMINATOR;
         Line *new = new_line(line);

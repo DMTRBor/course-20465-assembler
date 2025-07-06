@@ -6,4 +6,9 @@ struct command {
     int code;
 };
 
+struct instruction {
+    char *name;
+    int code;
+};
+
 #endif

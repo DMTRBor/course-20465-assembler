@@ -83,11 +83,9 @@ int is_macro_call(char *line, char *macro_name) {
 }
 
 
-/**
- * This function
- */
 int parse_assembler_source(FILE *fp, char *filename) {
     int inside_macro = FALSE;  /* macro flag */
+    int line_number = 1;
     LineArg line_arg_type = OTHER;
     char macro_filename[MAX_FNAME_LEN];
     Line *curr_line = NULL;
@@ -107,6 +105,16 @@ int parse_assembler_source(FILE *fp, char *filename) {
 
     /* process assembler file lines */
     while (curr_line != NULL) {
+        if(!is_line_content_valid(curr_line->line, line_number)) {
+            /* free lines list */
+            free_list(first_line);
+            /* free macro list if exists */
+            if (macro_curr_line != NULL)
+                free_macro(macro_curr_line);
+
+            return STATUS_CODE_ERR;
+        }
+
         line_arg_type = parse_line(curr_line->line);
 
         switch (line_arg_type) {
@@ -128,6 +136,7 @@ int parse_assembler_source(FILE *fp, char *filename) {
         if (macro_curr_line != NULL && inside_macro) {
             add_line_to_macro(macro_curr_line, curr_line);
             delete_line_from_list(curr_line);
+            line_number++;
             continue;
         }
 
@@ -137,6 +146,7 @@ int parse_assembler_source(FILE *fp, char *filename) {
 
         /* go to next line */
         curr_line = curr_line->next;
+        line_number++;
     }
 
     /* add macro-parsed file extension */

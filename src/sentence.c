@@ -1,4 +1,4 @@
-#include "../hdr/commands.h"
+#include "../hdr/sentence.h"
 
 
 struct command commands[] = {
@@ -18,4 +18,13 @@ struct command commands[] = {
     {"jsr", 13},
     {"rts", 14},
     {"stop", 15}
+};
+
+
+struct instruction instructions[] = {
+    {".data",   1},
+    {".string", 2},
+    {".mat",    3},
+    {".entry",  4},
+    {".extern", 5}
 };

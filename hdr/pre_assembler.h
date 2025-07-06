@@ -2,8 +2,9 @@
 #define __PRE_ASSEMBLER__H__
 
 #include "../hdr/utils.h"
-#include "../hdr/commands.h"
+#include "../hdr/sentence.h"
 #include "../hdr/data_struct.h"
+#include "../hdr/errors_handling.h"
 
 
 #define MACRO_START "mcro"
