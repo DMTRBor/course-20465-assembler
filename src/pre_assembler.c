@@ -105,16 +105,6 @@ int parse_assembler_source(FILE *fp, char *filename) {
 
     /* process assembler file lines */
     while (curr_line != NULL) {
-        if(!is_line_content_valid(curr_line->line, line_number)) {
-            /* free lines list */
-            free_list(first_line);
-            /* free macro list if exists */
-            if (macro_curr_line != NULL)
-                free_macro(macro_curr_line);
-
-            return STATUS_CODE_ERR;
-        }
-
         line_arg_type = parse_line(curr_line->line);
 
         switch (line_arg_type) {
@@ -122,6 +112,15 @@ int parse_assembler_source(FILE *fp, char *filename) {
             case COMMENT:
                 break;  /* ignore these lines */
             case MCRO:
+                /* check if macro name is valid */
+                if(!is_macro_name_valid(curr_line->line, line_number)) {
+                    free_list(first_line);  /* free lines list */
+
+                    if (macro_curr_line != NULL)  /* free macro list if exists */
+                        free_macro(macro_curr_line);
+
+                    return STATUS_CODE_ERR;
+                }
                 inside_macro = TRUE;
                 macro_curr_line = init_macro_list(get_macro_name(curr_line->line));
                 delete_line_from_list(curr_line);
