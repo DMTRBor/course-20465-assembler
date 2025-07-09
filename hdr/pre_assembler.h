@@ -9,6 +9,7 @@
 
 #define MACRO_START "mcro"
 #define MACRO_END "mcroend"
+#define MAX_MACROS_ALLOWED 50
 
 #define COMMENT_SIGN ";"
 

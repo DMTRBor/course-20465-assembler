@@ -96,11 +96,17 @@ void free_list_and_macro(Line *first_line, Macro *macro_curr_line) {
 int parse_assembler_source(FILE *fp, char *filename) {
     int inside_macro = FALSE;  /* macro flag */
     int line_number = 1;
+
     LineArg line_arg_type = OTHER;
+
     char macro_filename[MAX_FNAME_LEN];
+
     Line *curr_line = NULL;
     Line *first_line = NULL;
+
+    int macro_id, macro_count = 0;
     Macro *macro_curr_line = NULL;
+    Macro *macros[MAX_MACROS_ALLOWED] = { NULL };  /* array of macro lists */
 
     /* create file lines structured list, point to first line */
     curr_line = file_to_list(fp);
@@ -132,6 +138,10 @@ int parse_assembler_source(FILE *fp, char *filename) {
                 }
                 inside_macro = TRUE;
                 macro_curr_line = init_macro_list(get_macro_name(curr_line->line));
+                /* add new macro list to array of macro lists */
+                if (macro_count < MAX_MACROS_ALLOWED)
+                    macros[macro_count++] = macro_curr_line;
+
                 delete_line_from_list(curr_line);
                 break;
             case MCROEND:
@@ -152,9 +162,15 @@ int parse_assembler_source(FILE *fp, char *filename) {
             continue;
         }
 
-        /* found macro call */
-        if (macro_curr_line != NULL && !inside_macro && is_macro_call(curr_line->line, macro_curr_line->name))
-            insert_macro_in_list(curr_line, macro_curr_line);
+        if (!inside_macro) {
+            /* search for macro list in array by name */
+            for (macro_id = 0; macro_id < macro_count; macro_id++) {
+                if (is_macro_call(curr_line->line, macros[macro_id]->name)) {  /* found macro call */
+                    insert_macro_in_list(curr_line, macros[macro_id]);
+                    break;
+                }
+            }
+        }
 
         /* go to next line */
         curr_line = curr_line->next;
