@@ -7,6 +7,7 @@
 #include "../hdr/sentence.h"
 #include "../hdr/utils.h"
 
-int is_macro_name_valid(char *, int);
+int macro_name_valid(char *, int);
+int macro_args_num_valid(char *, int);
 
 #endif

@@ -3,7 +3,7 @@
 
 /* -------------------------- Pre-Assembler -------------------------- */
 
-int is_macro_name_valid(char *line, int line_number) {
+int macro_name_valid(char *line, int line_number) {
     int id;  /* array element index */
 
     /* check if command appears in macro name */
@@ -21,5 +21,28 @@ int is_macro_name_valid(char *line, int line_number) {
             return FALSE;
         }
     }
+
     return TRUE;
+}
+
+
+int macro_args_num_valid(char *line, int num_of_expected_args) {
+    char *line_args;
+    char *line_copy;
+    int num_of_args = 0;  /* number of args in line */
+
+    /* copy line for processing */
+    line_copy = strdup(line);
+    /* tokenize with whitespaces */
+    line_args = strtok(line_copy, WHITESPACE);
+
+    while (line_args != NULL) {
+        /* count argument */
+        num_of_args++;
+        /* next token/arg */
+        line_args = strtok(NULL, WHITESPACE);
+    }
+
+    free(line_copy);
+    return (num_of_args == num_of_expected_args);
 }

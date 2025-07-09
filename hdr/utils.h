@@ -15,6 +15,7 @@
 #define BASE_4 4
 #define BASE_10 10
 
+#define WHITESPACE " \t"
 #define NEWLINE_STR "\n"
 #define NEWLINE_CHAR '\n'
 #define NULL_TERMINATOR '\0'
