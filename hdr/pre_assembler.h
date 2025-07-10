@@ -2,9 +2,10 @@
 #define __PRE_ASSEMBLER__H__
 
 #include "../hdr/utils.h"
-#include "../hdr/sentence.h"
+#include "../hdr/const_tables.h"
 #include "../hdr/data_struct.h"
 #include "../hdr/errors_handling.h"
+#include "../hdr/first_pass.h"
 
 
 #define MACRO_START "mcro"

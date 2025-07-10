@@ -33,10 +33,10 @@ void delete_line_from_list(Line *curr) {
 }
 
 
-void free_list(Line *start) {
-    while (start != NULL) {
-        Line *temp = start;
-        start = start->next;
+void free_list(Line *curr) {
+    while (curr != NULL) {
+        Line *temp = curr;
+        curr = curr->next;
         free(temp->line);
         free(temp);
     }
@@ -68,20 +68,20 @@ Line* file_to_list(FILE *fp) {
 }
 
 
-int list_to_file(Line *start, FILE *fp) {
+int list_to_file(Line *curr, FILE *fp) {
     int line_number = 1;  /* initialize line number */
     
     if (fp == NULL)
         return STATUS_CODE_ERR;
 
-    while (start != NULL) {
+    while (curr != NULL) {
         /* write line to file stream */
         /* negative value indicates writing failed */
-        if (fprintf(fp, "%s\n", start->line) < 0) {
+        if (fprintf(fp, "%s\n", curr->line) < 0) {
             fprintf(stderr, "Error writing to file at line %d\n", line_number);
             return STATUS_CODE_ERR;
         }
-        start = start->next;
+        curr = curr->next;
         line_number++;
     }
 

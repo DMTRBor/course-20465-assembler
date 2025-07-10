@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../hdr/sentence.h"
+#include "../hdr/const_tables.h"
 #include "../hdr/utils.h"
 
 int macro_name_valid(char *, int);

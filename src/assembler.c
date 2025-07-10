@@ -41,7 +41,12 @@ int main(int argc, char *argv[])
         /* pre-assembler */
         if (parse_assembler_source(fp, argv[arg_id]) == STATUS_CODE_OK) {
             /* first pass */
-            printf("Here goes first pass...\n");
+            fprintf(stdout, "Running first pass for: %s\n", filename);
+            
+            if (run_first_pass(argv[arg_id]) == STATUS_CODE_OK) {
+                fprintf(stdout, "Running second pass for: %s\n", filename);
+                /* second pass */
+            }
         }
     }
 

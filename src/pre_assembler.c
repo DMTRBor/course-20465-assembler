@@ -108,7 +108,7 @@ int parse_assembler_source(FILE *fp, char *filename) {
     Macro *macro_curr_line = NULL;
     Macro *macros[MAX_MACROS_ALLOWED] = { NULL };  /* array of macro lists */
 
-    /* create file lines structured list, point to first line */
+    /* create file lines structured list */
     curr_line = file_to_list(fp);
     /* point to first line in file */
     first_line = curr_line;
@@ -181,10 +181,8 @@ int parse_assembler_source(FILE *fp, char *filename) {
     strcat(macro_filename, ASMB_MCRO_FILE_EXTEN);
 
     /* write list to file after macros expansion */
-    if ((fp = open_file(macro_filename, WRITE_FILE_PERMISSION)) == NULL) {
-        fclose(fp);
+    if ((fp = open_file(macro_filename, WRITE_FILE_PERMISSION)) == NULL)
         return STATUS_CODE_ERR;
-    }
 
     if (list_to_file(first_line, fp) == STATUS_CODE_ERR) {
         fclose(fp);

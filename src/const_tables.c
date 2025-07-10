@@ -1,4 +1,4 @@
-#include "../hdr/sentence.h"
+#include "../hdr/const_tables.h"
 
 
 struct command commands[] = {
