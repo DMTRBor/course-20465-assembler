@@ -27,7 +27,7 @@ void delete_line_from_list(Line *curr) {
     curr->line = strdup(temp->line);
     curr->next = temp->next;
 
-    /* free redundant next node */
+    /* free redundant next line */
     free(temp->line);
     free(temp);
 }

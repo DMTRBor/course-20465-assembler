@@ -17,5 +17,6 @@ typedef struct {
 #define MEMORY_SIZE 256
 #define NUM_OF_OPERANDS 3
 #define MAX_WORDS_IN_SENTENCE 5
+#define NUM_OF_ADDR_METHODS 4
 
 #endif

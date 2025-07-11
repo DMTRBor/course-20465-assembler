@@ -8,18 +8,24 @@
 #include "../hdr/utils.h"
 
 
-/* a node will represent a line in file */
-typedef struct Node {
+/* a line in file */
+typedef struct Line {
     char *line;
-    struct Node *next;
-} Node;
+    struct Line *next;
+} Line;
 
-typedef Node Line;
-
+/* macro list */
 typedef struct Macro {
     char *name;
     Line *line;
 } Macro;
+
+/* symbols table */
+typedef struct {
+    char *name;
+    unsigned int decimal_value;
+    char *type;
+} Symbol;
 
 /* line */
 Line* new_line(char *);
