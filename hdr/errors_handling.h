@@ -1,5 +1,5 @@
-#ifndef __ERROR_HANDLING__H__
-#define __ERROR_HANDLING__H__
+#ifndef __ERRORS_HANDLING__H__
+#define __ERRORS_HANDLING__H__
 
 #include <stdio.h>
 #include <string.h>
