@@ -10,6 +10,8 @@
 #define MAX_FNAME_LEN 51
 #define MAX_LINE_LEN 81
 
+#define IC_DC_RESET_VALUE -1
+
 #define MIN_ALLOWED_ARGS 2
 
 #define BASE_4 4

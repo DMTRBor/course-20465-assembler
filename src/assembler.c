@@ -10,6 +10,8 @@ int main(int argc, char *argv[])
     int arg_id = 0;
     FILE *fp;
 
+    int ic_value, dc_value;
+
     /* not enough arguments */
     if (argc < MIN_ALLOWED_ARGS) {
         fprintf(stderr, "Error!\nUsage: %s file1 file2 ...\n", argv[0]);
@@ -42,10 +44,14 @@ int main(int argc, char *argv[])
         if (parse_assembler_source(fp, argv[arg_id]) == STATUS_CODE_OK) {
             /* first pass */
             fprintf(stdout, "Running first pass for: %s\n", filename);
-            
-            if (run_first_pass(argv[arg_id]) == STATUS_CODE_OK) {
+            /* initialize IC and DC with reset value */
+            ic_value = IC_DC_RESET_VALUE;
+            dc_value = IC_DC_RESET_VALUE;
+    
+            if (run_first_pass(argv[arg_id], &ic_value, &dc_value) == STATUS_CODE_OK) {
                 fprintf(stdout, "Running second pass for: %s\n", filename);
                 /* second pass */
+                // run_second_pass(argv[arg_id], &ic_value, &dc_value);
             }
         }
     }

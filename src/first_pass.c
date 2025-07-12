@@ -1,13 +1,20 @@
 #include "../hdr/first_pass.h"
 
 
-int run_first_pass(char *filename) {
+int run_first_pass(char *filename, int *ic, int *dc) {
     int line_number = 1;
+    int error_flag = FALSE;
+
+    /* Initialize ic and dc */
+    *ic = IC_INITIAL_VALUE;
+    *dc = DC_INITIAL_VALUE;
 
     char am_filename[MAX_FNAME_LEN];
     FILE *fp;
 
-    Line *curr_line = NULL;
+    Line *curr_line = NULL;  /* lines list */
+    MemoryUnit *mem = NULL;  /* memory map */
+    Label *labels[MAX_LABELS_ALLOWED] =  { NULL };  /* labels map */
 
     /* add macro-parsed file extension */
     strcpy(am_filename, filename);
@@ -28,6 +35,8 @@ int run_first_pass(char *filename) {
     fclose(fp);
 
     while (curr_line != NULL) {
+        
+
         /* go to next line */
         curr_line = curr_line->next;
     }

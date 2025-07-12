@@ -5,7 +5,12 @@
 
 #include "../hdr/utils.h"
 #include "../hdr/data_struct.h"
+#include "../hdr/tables.h"
 
-int run_first_pass(char *);
+
+#define MAX_LABELS_ALLOWED 255
+
+
+int run_first_pass(char *, int *, int *);
 
 #endif
