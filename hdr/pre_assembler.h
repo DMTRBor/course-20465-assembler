@@ -2,7 +2,7 @@
 #define __PRE_ASSEMBLER__H__
 
 #include "../hdr/utils.h"
-#include "../hdr/const_tables.h"
+#include "../hdr/machine.h"
 #include "../hdr/data_struct.h"
 #include "../hdr/errors_handling.h"
 #include "../hdr/first_pass.h"
@@ -16,6 +16,7 @@
 
 #define NUM_OF_MCRO_ARGS 2
 #define NUM_OF_MCROEND_ARGS 1
+
 
 typedef enum {
     EMPTY_LINE,

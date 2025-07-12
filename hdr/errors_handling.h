@@ -4,10 +4,12 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../hdr/const_tables.h"
+#include "../hdr/machine.h"
 #include "../hdr/utils.h"
+
 
 int macro_name_valid(char *, int);
 int macro_args_num_valid(char *, int);
+
 
 #endif

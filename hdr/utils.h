@@ -32,15 +32,18 @@
 #define EXTERNAL_FILE_EXTEN ".ext"
 #define ENTRIES_FILE_EXTEN ".ent"
 
+
 enum {
     STATUS_CODE_OK,
     STATUS_CODE_ERR
 };
 
+
 enum {
     FALSE,
     TRUE
 };
+
 
 /* forward declarations */
 void decimal_to_base4(char *, char *);

@@ -14,18 +14,13 @@ typedef struct Line {
     struct Line *next;
 } Line;
 
+
 /* macro list */
 typedef struct Macro {
     char *name;
     Line *line;
 } Macro;
 
-/* symbols table */
-typedef struct {
-    char *name;
-    unsigned int decimal_value;
-    char *type;
-} Symbol;
 
 /* line */
 Line* new_line(char *);
@@ -33,6 +28,7 @@ void delete_line_from_list(Line *);
 void free_list(Line *);
 Line* file_to_list(FILE *);
 int list_to_file(Line *, FILE *);
+
 
 /* macro */
 Macro* init_macro_list(char *);

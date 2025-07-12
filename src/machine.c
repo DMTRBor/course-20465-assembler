@@ -1,4 +1,4 @@
-#include "../hdr/const_tables.h"
+#include "../hdr/machine.h"
 
 
 struct command commands[] = {
@@ -31,6 +31,11 @@ struct instruction instructions[] = {
 
 
 LegalAddrMethods legal_addressing_methods[] = {
+    /**
+     * op | opcode | src addr.method | dst addr.method
+     * example (first line):
+     * {"mov", 0}  |  0, 1, 2, 3       1, 2, 3
+     */
     { &commands[0],  {1, 1, 1, 1}, {0, 1, 1, 1} },
     { &commands[1],  {1, 1, 1, 1}, {1, 1, 1, 1} },
     { &commands[2],  {1, 1, 1, 1}, {0, 1, 1, 1} },
