@@ -14,6 +14,19 @@ struct instruction {
 };
 
 
+typedef enum {
+    NO_OPERANDS,
+    SINGLE_OPERAND,
+    TWO_OPERANDS
+};
+
+
+typedef struct {
+    struct command *cmd;
+    int expected_num_of_operands;
+} ExpectedNumOfOperands;
+
+
 /* word memory structure */
 typedef struct {
     unsigned int encoding_type : 2;   /* E,R,A - bits 0-1 */
@@ -53,5 +66,10 @@ extern LegalAddrMethods legal_addressing_methods[];
 
 
 #define MEMORY_SIZE 256
+
+#define MIN_REGISTER_INDEX 0
+#define MAX_REGISTER_INDEX 7
+
+#define MAX_WORDS_IN_SENTENCE 5
 
 #endif
