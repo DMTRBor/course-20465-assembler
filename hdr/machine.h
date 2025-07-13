@@ -2,7 +2,7 @@
 #define __MACHINE_H__
 
 
-struct command {
+struct operation {
     char *name;
     int code;
 };
@@ -16,7 +16,7 @@ typedef enum {
 
 
 typedef struct {
-    struct command *cmd;
+    struct operation *oper;
     int expected_num_of_operands;
 } ExpectedNumOfOperands;
 
@@ -47,14 +47,14 @@ typedef struct {
 
 
 typedef struct {
-    struct command *cmd;
+    struct operation *oper;
     AddrMethodIndex legal_src_addr_method;
     AddrMethodIndex legal_dst_addr_method;
 } LegalAddrMethods;
 
 
 /* external declarations */
-extern struct command commands[];
+extern struct operation operations[];
 extern const char *instructions[];
 extern const char *registers[];
 extern LegalAddrMethods legal_addressing_methods[];
@@ -64,7 +64,7 @@ extern LegalAddrMethods legal_addressing_methods[];
 
 #define MAX_WORDS_IN_SENTENCE 5
 
-#define NUM_OF_COMMANDS 16
+#define NUM_OF_OPERATIONS 16
 #define NUM_OF_INSTRUCTIONS 5
 
 #define NUM_OF_REGISTERS 8

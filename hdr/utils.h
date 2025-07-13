@@ -68,7 +68,7 @@ typedef enum {
     MCRO,
     MCROEND,
     LABEL,
-    COMMAND,
+    OPERATION,
     INSTRUCTION,
     DIRECT_ADDR,
     REGISTER,

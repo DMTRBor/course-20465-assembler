@@ -6,11 +6,11 @@
 int is_macro_name_valid(char *line, int line_number) {
     int id;  /* array element index */
 
-    /* check if command appears in macro name */
-    for (id = 0; id < NUM_OF_COMMANDS; id++) {
-        if (strstr(line, commands[id].name) != NULL) {
+    /* check if operation appears in macro name */
+    for (id = 0; id < NUM_OF_OPERATIONS; id++) {
+        if (strstr(line, operations[id].name) != NULL) {
             fprintf(stderr,
-                "Illegal argument in line %d: command '%s' found in line\n", line_number, commands[id].name);
+                "Illegal argument in line %d: operation '%s' found in line\n", line_number, operations[id].name);
             return FALSE;
         }
     }
@@ -61,17 +61,17 @@ int is_macro_args_num_valid(char *line, int num_of_expected_args) {
 
 /* -------------------------- First / Second Pass -------------------------- */
 
-int is_command(char *arg) {
+int is_operation(char *arg) {
     int id;  /* array index */
 
-    /* check if argument is a command */
-    for (id = 0; id < NUM_OF_COMMANDS; id++) {
-        if (strcmp(arg, commands[id].name) == STR_EQUAL) {
+    /* check if argument is an operation */
+    for (id = 0; id < NUM_OF_OPERATIONS; id++) {
+        if (strcmp(arg, operations[id].name) == STR_EQUAL) {
             return TRUE;
         }
     }
 
-    return FALSE;  /* not a command */
+    return FALSE;  /* not an operation */
 }
 
 
@@ -125,8 +125,8 @@ LineArg detect_and_validate_first_arg(char *line, int line_number) {
     /* tokenize with whitespaces */
     line_args = strtok(line_copy, WHITESPACE);
 
-    if (is_command(line_args)) {
-        line_arg_type = COMMAND;
+    if (is_operation(line_args)) {
+        line_arg_type = OPERATION;
     }
     else if (is_instruction(line_args)) {
         line_arg_type = INSTRUCTION;

@@ -56,7 +56,7 @@ int run_first_pass(char *filename, int *ic, int *dc) {
             case INSTRUCTION:
                 break;
 
-            case COMMAND:
+            case OPERATION:
                 break;
 
             default:
