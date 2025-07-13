@@ -16,8 +16,16 @@ int macro_name_valid(char *line, int line_number) {
 
     /* check if instruction appears in macro name */
     for (id = 0; id < NUM_OF_INSTRUCTIONS; id++) {
-        if (strstr(line, instructions[id].name) != NULL) {
-            fprintf(stderr, "Error in line %d: instruction '%s' found in line\n", line_number, instructions[id].name);
+        if (strstr(line, instructions[id]) != NULL) {
+            fprintf(stderr, "Error in line %d: instruction '%s' found in line\n", line_number, instructions[id]);
+            return FALSE;
+        }
+    }
+
+    /* check if register name appears in macro name */
+    for (id = 0; id < NUM_OF_REGISTERS; id++) {
+        if (strstr(line, registers[id]) != NULL) {
+            fprintf(stderr, "Error in line %d: register '%s' found in line\n", line_number, registers[id]);
             return FALSE;
         }
     }

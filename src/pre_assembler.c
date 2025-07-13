@@ -1,98 +1,6 @@
 #include "../hdr/pre_assembler.h"
 
 
-LineArg parse_line(char *line) {
-    char *line_args;
-    char *line_copy;
-    LineArg line_arg_type = OTHER;
-
-    /* copy line for processing */
-    line_copy = strdup(line);
-    /* tokenize with whitespaces */
-    line_args = strtok(line_copy, WHITESPACE);
-
-    while (line_args != NULL) {
-        if (strcmp(line_args, NEWLINE_STR) == STR_EQUAL) {
-            line_arg_type = EMPTY_LINE;
-            break;
-        }
-        if (strcmp(line_args, COMMENT_SIGN) == STR_EQUAL) {
-            line_arg_type = COMMENT;
-            break;
-        }
-        if (strcmp(line_args, MACRO_START) == STR_EQUAL) {
-            line_arg_type = MCRO;
-            break;
-        }
-        if (strcmp(line_args, MACRO_END) == STR_EQUAL) {
-            line_arg_type = MCROEND;
-            break;
-        }
-        /* next token/arg */
-        line_args = strtok(NULL, WHITESPACE);
-    }
-
-    free(line_copy);
-    return line_arg_type;
-}
-
-
-char* get_macro_name(char *line) {
-    char *line_args;
-    int arg_id = 0;  /* token index */
-
-    /* tokenize with whitespaces */
-    line_args = strtok(line, WHITESPACE);
-
-    while (line_args != NULL) {
-        /* macro name goes after mcro label */
-        if (arg_id == 1)
-            break;
-
-        /* next token/arg */
-        line_args = strtok(NULL, WHITESPACE);
-        arg_id++;
-    }
-
-    return line_args;
-}
-
-
-int is_macro_call(char *line, char *macro_name) {
-    char *line_args;
-    char *line_copy;
-
-    /* copy line for processing */
-    line_copy = strdup(line);
-    /* tokenize with whitespaces */
-    line_args = strtok(line_copy, WHITESPACE);
-
-    while (line_args != NULL) {
-        /* macro called */
-        if (strcmp(line_args, macro_name) == STR_EQUAL) {
-            free(line_copy);
-            return TRUE;
-        }
-
-        /* next token/arg */
-        line_args = strtok(NULL, WHITESPACE);
-    }
-
-    free(line_copy);
-    return FALSE;
-}
-
-
-void free_list_and_macro(Line *first_line, Macro *macro_curr_line) {
-    /* free lines list */
-    free_list(first_line);
-
-    /* free macro list if exists */
-    if (macro_curr_line != NULL)
-        free_macro(macro_curr_line);
-}
-
-
 int parse_assembler_source(FILE *fp, char *filename) {
     int inside_macro = FALSE;  /* macro flag */
     int line_number = 1;
@@ -117,11 +25,11 @@ int parse_assembler_source(FILE *fp, char *filename) {
         fclose(fp);
         return STATUS_CODE_ERR;
     }
-    fclose(fp);
+    fclose(fp);  /* not needed - close file handle */
 
     /* process assembler file lines */
     while (curr_line != NULL) {
-        line_arg_type = parse_line(curr_line->line);
+        line_arg_type = detect_arg_type(curr_line->line);
         line_number++;
 
         switch (line_arg_type) {
@@ -129,6 +37,7 @@ int parse_assembler_source(FILE *fp, char *filename) {
             case COMMENT:
             case OTHER:
                 break;  /* ignore these lines */
+
             case MCRO:
                 /* check if macro name is valid */
                 /* check if macro header contains extraneous args */
@@ -144,6 +53,7 @@ int parse_assembler_source(FILE *fp, char *filename) {
 
                 delete_line_from_list(curr_line);
                 break;
+
             case MCROEND:
                 /* check if macro end contains extraneous args */
                 if (!macro_args_num_valid(curr_line->line, NUM_OF_MCROEND_ARGS)) {

@@ -1,5 +1,5 @@
-#ifndef __ERRORS_HANDLING__H__
-#define __ERRORS_HANDLING__H__
+#ifndef __ERRORS_HANDLING_H__
+#define __ERRORS_HANDLING_H__
 
 #include <stdio.h>
 #include <string.h>
@@ -10,10 +10,6 @@
 
 int macro_name_valid(char *, int);
 int macro_args_num_valid(char *, int);
-
-
-#define NUM_OF_COMMANDS 16
-#define NUM_OF_INSTRUCTIONS 5
 
 
 #endif

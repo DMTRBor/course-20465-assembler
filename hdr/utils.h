@@ -1,5 +1,5 @@
-#ifndef __UTILS__H__
-#define __UTILS__H__
+#ifndef __UTILS_H__
+#define __UTILS_H__
 
 #include <stdio.h>
 #include <string.h>
@@ -17,8 +17,17 @@
 #define BASE_4 4
 #define BASE_10 10
 
-#define WHITESPACE " \t"
+/* delimiters and hallmarks */
+#define MACRO_START "mcro"
+#define MACRO_END "mcroend"
+#define LABEL_SIGN ":"
+#define INSTRUCTION_SIGN "."
+#define DIRECT_ADDR_SIGN "#"
+#define MATRIX_SIGN "[]"
+#define COMMENT_SIGN ";"
 #define NEWLINE_STR "\n"
+
+#define WHITESPACE " \t"
 #define NEWLINE_CHAR '\n'
 #define NULL_TERMINATOR '\0'
 #define ZERO '0'
@@ -47,10 +56,25 @@ enum {
 };
 
 
+typedef enum {
+    EMPTY_LINE,
+    COMMENT,
+    MCRO,
+    MCROEND,
+    OTHER
+} LineArg;
+
+
 /* forward declarations */
 void decimal_to_base4(char *, char *);
+
 long file_content_size(FILE*);
 FILE* open_file(char *, char *);
 int line_too_long(char *, FILE *);
+
+LineArg detect_arg_type(char *);
+
+char* get_macro_name(char *);
+int is_macro_call(char *, char *);
 
 #endif

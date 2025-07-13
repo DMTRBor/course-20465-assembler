@@ -205,3 +205,14 @@ void free_macro(Macro *mcro) {
     free(mcro->name);
     free(mcro);
 }
+
+
+/* -------------------------- Macro + Lines -------------------------- */
+void free_list_and_macro(Line *first_line, Macro *macro_curr_line) {
+    /* free lines list */
+    free_list(first_line);
+
+    /* free macro list if exists */
+    if (macro_curr_line != NULL)
+        free_macro(macro_curr_line);
+}

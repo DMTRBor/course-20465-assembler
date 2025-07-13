@@ -81,6 +81,47 @@ FILE* open_file(char *filename, char *permission) {
 
 
 /**
+ * This function receives a line
+ */
+LineArg detect_arg_type(char *line) {
+    char *line_args;
+    char *line_copy;
+    LineArg line_arg_type = OTHER;
+
+    /* copy line for processing */
+    line_copy = strdup(line);
+    /* tokenize with whitespaces */
+    line_args = strtok(line_copy, WHITESPACE);
+
+    while (line_args != NULL) {
+        if (strcmp(line_args, NEWLINE_STR) == STR_EQUAL) {
+            line_arg_type = EMPTY_LINE;
+            break;
+        }
+        if (strcmp(line_args, COMMENT_SIGN) == STR_EQUAL) {
+            line_arg_type = COMMENT;
+            break;
+        }
+        if (strcmp(line_args, MACRO_START) == STR_EQUAL) {
+            line_arg_type = MCRO;
+            break;
+        }
+        if (strcmp(line_args, MACRO_END) == STR_EQUAL) {
+            line_arg_type = MCROEND;
+            break;
+        }
+        /* next token/arg */
+        line_args = strtok(NULL, WHITESPACE);
+    }
+
+    free(line_copy);
+    return line_arg_type;
+}
+
+
+/* -------------------------- Macro -------------------------- */
+
+/**
  * This function gets a pointer to a
  * line read from file, that has a
  * pre-defined maximum length and a
@@ -99,4 +140,50 @@ int line_too_long(char *line, FILE *fp) {
     /* newline not found at the end of the
        line and not reached EOF */
     return (line[line_length] != NEWLINE_CHAR && !feof(fp));
+}
+
+
+char* get_macro_name(char *line) {
+    char *line_args;
+    int arg_id = 0;  /* token index */
+
+    /* tokenize with whitespaces */
+    line_args = strtok(line, WHITESPACE);
+
+    while (line_args != NULL) {
+        /* macro name goes after mcro label */
+        if (arg_id == 1)
+            break;
+
+        /* next token/arg */
+        line_args = strtok(NULL, WHITESPACE);
+        arg_id++;
+    }
+
+    return line_args;
+}
+
+
+int is_macro_call(char *line, char *macro_name) {
+    char *line_args;
+    char *line_copy;
+
+    /* copy line for processing */
+    line_copy = strdup(line);
+    /* tokenize with whitespaces */
+    line_args = strtok(line_copy, WHITESPACE);
+
+    while (line_args != NULL) {
+        /* macro called */
+        if (strcmp(line_args, macro_name) == STR_EQUAL) {
+            free(line_copy);
+            return TRUE;
+        }
+
+        /* next token/arg */
+        line_args = strtok(NULL, WHITESPACE);
+    }
+
+    free(line_copy);
+    return FALSE;
 }

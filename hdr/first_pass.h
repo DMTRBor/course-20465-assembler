@@ -1,5 +1,5 @@
-#ifndef __FIRST_PASS__H__
-#define __FIRST_PASS__H__
+#ifndef __FIRST_PASS_H__
+#define __FIRST_PASS_H__
 
 #include <stdio.h>
 

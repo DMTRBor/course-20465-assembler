@@ -1,4 +1,5 @@
 #include "../hdr/pre_assembler.h"
+#include "../hdr/first_pass.h"
 
 
 /**
@@ -51,7 +52,7 @@ int main(int argc, char *argv[])
             if (run_first_pass(argv[arg_id], &ic_value, &dc_value) == STATUS_CODE_OK) {
                 fprintf(stdout, "Running second pass for: %s\n", filename);
                 /* second pass */
-                // run_second_pass(argv[arg_id], &ic_value, &dc_value);
+                /* run_second_pass(argv[arg_id], &ic_value, &dc_value); */
             }
         }
     }

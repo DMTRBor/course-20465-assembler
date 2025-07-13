@@ -1,5 +1,5 @@
-#ifndef __DATA_STRUCT__H__
-#define __DATA_STRUCT__H__
+#ifndef __DATA_STRUCT_H__
+#define __DATA_STRUCT_H__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,5 +36,8 @@ void add_line_to_macro(Macro *, Line *);
 Line *copy_macro_lines(Line *);
 void insert_macro_in_list(Line *, Macro *);
 void free_macro(Macro *);
+
+/* line and macro */
+void free_list_and_macro(Line *, Macro *);
 
 #endif

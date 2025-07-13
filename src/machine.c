@@ -21,12 +21,24 @@ struct command commands[] = {
 };
 
 
-struct instruction instructions[] = {
-    {".data",   1},
-    {".string", 2},
-    {".mat",    3},
-    {".entry",  4},
-    {".extern", 5}
+const char *instructions[NUM_OF_INSTRUCTIONS] = {
+    ".data",
+    ".string",
+    ".mat",
+    ".entry",
+    ".extern"
+};
+
+
+const char *registers[NUM_OF_REGISTERS] = {
+    "r0",
+    "r1",
+    "r2",
+    "r3",
+    "r4",
+    "r5",
+    "r6",
+    "r7"
 };
 
 

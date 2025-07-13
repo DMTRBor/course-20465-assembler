@@ -1,5 +1,5 @@
-#ifndef __TABLES__H__
-#define __TABLES__H__
+#ifndef __TABLES_H__
+#define __TABLES_H__
 
 #include "../hdr/data_struct.h"
 #include "../hdr/machine.h"

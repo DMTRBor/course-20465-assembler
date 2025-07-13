@@ -1,14 +1,8 @@
-#ifndef __MACHINE__H__
+#ifndef __MACHINE_H__
 #define __MACHINE_H__
 
 
 struct command {
-    char *name;
-    int code;
-};
-
-
-struct instruction {
     char *name;
     int code;
 };
@@ -61,15 +55,18 @@ typedef struct {
 
 /* external declarations */
 extern struct command commands[];
-extern struct instruction instructions[];
+extern const char *instructions[];
+extern const char *registers[];
 extern LegalAddrMethods legal_addressing_methods[];
 
 
 #define MEMORY_SIZE 256
 
-#define MIN_REGISTER_INDEX 0
-#define MAX_REGISTER_INDEX 7
-
 #define MAX_WORDS_IN_SENTENCE 5
+
+#define NUM_OF_COMMANDS 16
+#define NUM_OF_INSTRUCTIONS 5
+
+#define NUM_OF_REGISTERS 8
 
 #endif
