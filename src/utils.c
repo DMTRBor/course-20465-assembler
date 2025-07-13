@@ -86,7 +86,7 @@ FILE* open_file(char *filename, char *permission) {
 LineArg detect_arg_type(char *line) {
     char *line_args;
     char *line_copy;
-    LineArg line_arg_type = OTHER;
+    LineArg line_arg_type = ERROR;
 
     /* copy line for processing */
     line_copy = strdup(line);
@@ -98,15 +98,15 @@ LineArg detect_arg_type(char *line) {
             line_arg_type = EMPTY_LINE;
             break;
         }
-        if (strcmp(line_args, COMMENT_SIGN) == STR_EQUAL) {
+        else if (line_args[0] == COMMENT_SIGN) {
             line_arg_type = COMMENT;
             break;
         }
-        if (strcmp(line_args, MACRO_START) == STR_EQUAL) {
+        else if (strcmp(line_args, MACRO_START) == STR_EQUAL) {
             line_arg_type = MCRO;
             break;
         }
-        if (strcmp(line_args, MACRO_END) == STR_EQUAL) {
+        else if (strcmp(line_args, MACRO_END) == STR_EQUAL) {
             line_arg_type = MCROEND;
             break;
         }

@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
         fprintf(stdout, "Processing file: %s\n", filename);
 
         /* pre-assembler */
-        if (parse_assembler_source(fp, argv[arg_id]) == STATUS_CODE_OK) {
+        if (run_pre_assembler(fp, argv[arg_id]) == STATUS_CODE_OK) {
             /* first pass */
             fprintf(stdout, "Running first pass for: %s\n", filename);
             /* initialize IC and DC with reset value */

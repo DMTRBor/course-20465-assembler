@@ -3,9 +3,11 @@
 
 int run_first_pass(char *filename, int *ic, int *dc) {
     int line_number = 1;
+    /* use error cheking for content of .am file */
     int error_flag = FALSE;
+    LineArg line_arg_type = ERROR;
 
-    LineArg line_arg_type = OTHER;
+    int is_label = FALSE;  /* label flag */
 
     /* Initialize ic and dc */
     *ic = IC_INITIAL_VALUE;
@@ -37,42 +39,30 @@ int run_first_pass(char *filename, int *ic, int *dc) {
     fclose(fp);  /* not needed - close file handle */
 
     while (curr_line != NULL) {
-        line_arg_type = detect_arg_type(curr_line->line);
+        line_arg_type = detect_and_validate_first_arg(curr_line->line, line_number);
         line_number++;
 
-        // switch (line_arg_type) {
-        //     case EMPTY_LINE:
-        //     case COMMENT:
-        //         break;  /* ignore these lines */
+        switch (line_arg_type) {
+            case EMPTY_LINE:
+            case COMMENT:
+                break;  /* ignore these lines */
 
-        //     case OTHER: {
-        //         /* process other lines */
-        //         if (process_other_line(curr_line->line, &mem, labels, ic, dc) == STATUS_CODE_ERR) {
-        //             error_flag = TRUE;
-        //         }
-        //         break;
-        //     }
+            case LABEL:
+                is_label = TRUE;
+                /* add to labels table */
 
-        //     case LABEL: {
-        //         /* process label line */
-        //         if (process_label_line(curr_line->line, &mem, labels, ic) == STATUS_CODE_ERR) {
-        //             error_flag = TRUE;
-        //         }
-        //         break;
-        //     }
+                break;
 
-        //     case INSTRUCTION: {
-        //         /* process instruction line */
-        //         if (process_instruction_line(curr_line->line, &mem, labels, ic) == STATUS_CODE_ERR) {
-        //             error_flag = TRUE;
-        //         }
-        //         break;
-        //     }
+            case INSTRUCTION:
+                break;
 
-        //     default:
-        //         fprintf(stderr, "Error in line %d: unrecognized line type\n", line_number);
-        //         error_flag = TRUE;
-        // }
+            case COMMAND:
+                break;
+
+            default:
+                fprintf(stderr, "Argument error in line %d: unrecognized argument\n", line_number);
+                error_flag = TRUE;
+        }
 
         /* go to next line */
         curr_line = curr_line->next;

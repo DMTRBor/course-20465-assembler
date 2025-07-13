@@ -9,6 +9,7 @@
 /* one last character is null terminator */
 #define MAX_FNAME_LEN 51
 #define MAX_LINE_LEN 81
+#define REG_NAME_LEN 2
 
 #define IC_DC_RESET_VALUE -1
 
@@ -23,13 +24,17 @@
 #define LABEL_SIGN ":"
 #define INSTRUCTION_SIGN "."
 #define DIRECT_ADDR_SIGN "#"
-#define MATRIX_SIGN "[]"
-#define COMMENT_SIGN ";"
+#define REGISTER_PREFIX "r"
+#define MATRIX_LEFT_BRACE "["
+#define MATRIX_RIGHT_BRACE "]"
+#define COMMENT_SIGN ';'
 #define NEWLINE_STR "\n"
 
 #define WHITESPACE " \t"
 #define NEWLINE_CHAR '\n'
 #define NULL_TERMINATOR '\0'
+#define UNDERSCORE '_'
+#define COMMA ','
 #define ZERO '0'
 
 #define STR_EQUAL 0
@@ -37,6 +42,7 @@
 #define READ_FILE_PERMISSION "r"
 #define WRITE_FILE_PERMISSION "w"
 
+/* file extensions */
 #define ASMB_FILE_EXTEN ".as"
 #define ASMB_MCRO_FILE_EXTEN ".am"
 #define OBJECT_FILE_EXTEN ".ob"
@@ -61,7 +67,13 @@ typedef enum {
     COMMENT,
     MCRO,
     MCROEND,
-    OTHER
+    LABEL,
+    COMMAND,
+    INSTRUCTION,
+    DIRECT_ADDR,
+    REGISTER,
+    MATRIX,
+    ERROR
 } LineArg;
 
 

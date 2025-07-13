@@ -6,6 +6,7 @@
 #include "../hdr/utils.h"
 #include "../hdr/data_struct.h"
 #include "../hdr/tables.h"
+#include "../hdr/errors_handling.h"
 
 
 #define MAX_LABELS_ALLOWED 255

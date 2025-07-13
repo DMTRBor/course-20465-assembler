@@ -52,7 +52,7 @@ Line* file_to_list(FILE *fp) {
             fprintf(stderr, "Line too long in file, max length is %d characters\n", MAX_LINE_LEN - 1);
             return NULL;
         }
-
+        /* cut ending new line */
         line[strcspn(line, NEWLINE_STR)] = NULL_TERMINATOR;
         Line *new = new_line(line);
 

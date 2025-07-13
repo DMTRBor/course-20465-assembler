@@ -1,11 +1,11 @@
 #include "../hdr/pre_assembler.h"
 
 
-int parse_assembler_source(FILE *fp, char *filename) {
+int run_pre_assembler(FILE *fp, char *filename) {
     int inside_macro = FALSE;  /* macro flag */
     int line_number = 1;
-
-    LineArg line_arg_type = OTHER;
+    /* no error checking for file content */
+    LineArg line_arg_type = EMPTY_LINE;
 
     char macro_filename[MAX_FNAME_LEN];
 
@@ -35,13 +35,12 @@ int parse_assembler_source(FILE *fp, char *filename) {
         switch (line_arg_type) {
             case EMPTY_LINE:
             case COMMENT:
-            case OTHER:
                 break;  /* ignore these lines */
 
             case MCRO:
                 /* check if macro name is valid */
                 /* check if macro header contains extraneous args */
-                if (!macro_name_valid(curr_line->line, line_number) || !macro_args_num_valid(curr_line->line, NUM_OF_MCRO_ARGS)) {
+                if (!is_macro_name_valid(curr_line->line, line_number) || !is_macro_args_num_valid(curr_line->line, NUM_OF_MCRO_ARGS)) {
                     free_list_and_macro(first_line, macro_curr_line);
                     return STATUS_CODE_ERR;
                 }
@@ -56,12 +55,15 @@ int parse_assembler_source(FILE *fp, char *filename) {
 
             case MCROEND:
                 /* check if macro end contains extraneous args */
-                if (!macro_args_num_valid(curr_line->line, NUM_OF_MCROEND_ARGS)) {
+                if (!is_macro_args_num_valid(curr_line->line, NUM_OF_MCROEND_ARGS)) {
                     free_list_and_macro(first_line, macro_curr_line);
                     return STATUS_CODE_ERR;
                 }
                 inside_macro = FALSE;
                 delete_line_from_list(curr_line);
+                break;
+
+            default:
                 break;
         }
 

@@ -33,8 +33,8 @@ typedef struct {
 typedef enum {
     IMMEDIATE,  /* 00 */
     DIRECT,     /* 01 */
-    MATRIX,     /* 10 */
-    REGISTER    /* 11 */
+    MAT,        /* 10 */
+    REG         /* 11 */
 } AddrMethodCode;
 
 

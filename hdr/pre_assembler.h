@@ -12,6 +12,6 @@
 #define NUM_OF_MCROEND_ARGS 1
 
 
-int parse_assembler_source(FILE *, char *);
+int run_pre_assembler(FILE *, char *);
 
 #endif
