@@ -9,9 +9,6 @@
 #include "../hdr/errors_handling.h"
 
 
-#define MAX_LABELS_ALLOWED 255
-
-
-int run_first_pass(char *, int *, int *);
+int run_first_pass(char *, int *, int *, MemoryUnit *, Label *);
 
 #endif

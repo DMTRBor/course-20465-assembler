@@ -1,6 +1,9 @@
 #ifndef __TABLES_H__
 #define __TABLES_H__
 
+#include <stdlib.h>
+#include <string.h>
+
 #include "../hdr/data_struct.h"
 #include "../hdr/machine.h"
 
@@ -31,5 +34,23 @@ typedef struct MemoryUnit {
 
 #define IC_INITIAL_VALUE 100
 #define DC_INITIAL_VALUE 0
+
+/* ----------- Memory Table Functions ----------- */
+MemoryUnit* new_mem_unit(void);
+void set_mem_unit_type(MemoryUnit *, int);
+void set_mem_unit_addr(MemoryUnit *, unsigned int);
+void set_word_fields(MemoryUnit *,
+                     unsigned int, 
+                     unsigned int,
+                     unsigned int, 
+                     unsigned int);
+void add_mem_unit_to_table(MemoryUnit **, MemoryUnit *);
+void free_mem_list(MemoryUnit *head);
+
+/* ----------- Labels Table Functions ----------- */
+Label* new_label(void);
+void set_label_fields(Label *, int, char *, unsigned int);
+void free_label(Label *);
+int is_label_exist(Label *, Label *, int);
 
 #endif

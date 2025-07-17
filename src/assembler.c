@@ -48,8 +48,11 @@ int main(int argc, char *argv[])
             /* initialize IC and DC with reset value */
             ic_value = IC_DC_RESET_VALUE;
             dc_value = IC_DC_RESET_VALUE;
+
+            MemoryUnit *mem = NULL;  /* memory map */
+            Label *labels = NULL;  /* labels map */
     
-            if (run_first_pass(argv[arg_id], &ic_value, &dc_value) == STATUS_CODE_OK) {
+            if (run_first_pass(argv[arg_id], &ic_value, &dc_value, mem, &labels) == STATUS_CODE_OK) {
                 fprintf(stdout, "Running second pass for: %s\n", filename);
                 /* second pass */
                 /* run_second_pass(argv[arg_id], &ic_value, &dc_value); */

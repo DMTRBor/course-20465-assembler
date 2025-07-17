@@ -11,7 +11,7 @@
 #define MAX_LINE_LEN 81
 #define REG_NAME_LEN 2
 
-#define IC_DC_RESET_VALUE -1
+#define IC_DC_RESET_VALUE 0
 
 #define MIN_ALLOWED_ARGS 2
 

@@ -1,7 +1,7 @@
 #include "../hdr/first_pass.h"
 
 
-int run_first_pass(char *filename, int *ic, int *dc) {
+int run_first_pass(char *filename, int *ic, int *dc, MemoryUnit *mem, Label *labels) {
     int line_number = 1;
     /* use error cheking for content of .am file */
     int error_flag = FALSE;
@@ -9,16 +9,11 @@ int run_first_pass(char *filename, int *ic, int *dc) {
 
     int is_label = FALSE;  /* label flag */
 
-    /* Initialize ic and dc */
-    *ic = IC_INITIAL_VALUE;
-    *dc = DC_INITIAL_VALUE;
-
     char am_filename[MAX_FNAME_LEN];
     FILE *fp;
 
     Line *curr_line = NULL;  /* lines list */
-    MemoryUnit *mem = NULL;  /* memory map */
-    Label *labels[MAX_LABELS_ALLOWED] =  { NULL };  /* labels map */
+    Label *curr_label = NULL;  /* current label */
 
     /* add macro-parsed file extension */
     strcpy(am_filename, filename);
@@ -54,9 +49,35 @@ int run_first_pass(char *filename, int *ic, int *dc) {
                 break;
 
             case INSTRUCTION:
+                /* .entry will be completed in second pass */
+                if (is_extern()) {
+                    /* add label after .extern to labels table */
+                    /* set type of label as external and value as 0 */
+                }
                 break;
 
             case OPERATION:
+                // if (is_label) {
+                    // /* add label to labels table */
+                    // curr_label = init_label(curr_line->line, CODE, *ic);
+                    // if (curr_label == NULL) {
+                    //     fprintf(stderr, "Memory allocation error in line %d\n", line_number);
+                    //     error_flag = TRUE;
+                    //     break;
+                    // }
+                    // /* check if label already exists */
+                    // if (add_label_to_table(labels, curr_label, *ic) == STATUS_CODE_ERR) {
+                    //     fprintf(stderr, "Label '%s' already exists in line %d\n", curr_label->name, line_number);
+                    //     free(curr_label);
+                    //     error_flag = TRUE;
+                    // }
+                // }
+
+                /* parse operands */
+                
+
+                /* encode operation and operands */
+
                 break;
 
             default:
