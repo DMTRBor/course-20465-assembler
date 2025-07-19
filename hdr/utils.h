@@ -31,6 +31,7 @@
 #define NEWLINE_STR "\n"
 
 #define WHITESPACE " \t"
+#define OP_DELIMITERS " \t\r[],"
 #define NEWLINE_CHAR '\n'
 #define NULL_TERMINATOR '\0'
 #define UNDERSCORE '_'

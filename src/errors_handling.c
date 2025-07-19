@@ -125,7 +125,13 @@ LineArg detect_and_validate_first_arg(char *line, int line_number) {
     /* tokenize with whitespaces */
     line_args = strtok(line_copy, WHITESPACE);
 
-    if (is_operation(line_args)) {
+    if (*line == NULL_TERMINATOR || strcmp(line_args, NEWLINE_STR) == STR_EQUAL) {
+        line_arg_type = EMPTY_LINE;
+    }
+    else if (line_args[0] == COMMENT_SIGN) {
+        line_arg_type = COMMENT;
+    }
+    else if (is_operation(line_args)) {
         line_arg_type = OPERATION;
     }
     else if (is_instruction(line_args)) {
@@ -134,13 +140,87 @@ LineArg detect_and_validate_first_arg(char *line, int line_number) {
     else if (is_valid_label(line_args, line_number)) {
         line_arg_type = LABEL;
     }
-    else if (strcmp(line_args, NEWLINE_STR) == STR_EQUAL) {
-        line_arg_type = EMPTY_LINE;
-    }
-    else if (line_args[0] == COMMENT_SIGN) {
-        line_arg_type = COMMENT;
-    }
 
     free(line_copy);
     return line_arg_type;
+}
+
+
+int is_operands_num_valid(char *line, int num_of_operands) {
+    char *line_args;
+    char *line_copy;
+    char *operation_name;
+    int id;
+
+    /* copy line for processing */
+    line_copy = strdup(line);
+    /* get first token (operation name) */
+    operation_name = strtok(line_copy, WHITESPACE);
+
+    /* search for operation and compare with expected_num_of_operands table */
+    for (id = 0; id < NUM_OF_OPERATIONS; id++) {
+        if (strcmp(operation_name, expected_num_of_operands[id].oper->name) == STR_EQUAL) {
+            /* found operation, compare operand count */
+            free(line_copy);
+            return (num_of_operands == expected_num_of_operands[id].expected_num_of_operands);
+        }
+    }
+
+    /* operation not found */
+    free(line_copy);
+    return FALSE;
+}
+
+
+int is_operands_legal(char *line, int num_of_operands) {
+    char *line_args;
+    char *line_copy;
+    char *operation_name;
+    int id;
+
+    /* copy line for processing */
+    line_copy = strdup(line);
+    /* get first token (operation name) */
+    operation_name = strtok(line_copy, WHITESPACE);
+
+    /* TODO */
+
+    /* operation not found */
+    free(line_copy);
+    return FALSE;
+}
+
+
+/**
+ * This function receives a line and line number, parses line arguments 
+ * with different delimiters and returns the total number of arguments.
+ */
+int get_num_of_operands(char *line, int line_number) {
+    char *line_args;
+    char *line_copy;
+    int num_of_args = 0;
+
+    /* copy line for processing */
+    line_copy = strdup(line);
+    /* tokenize with different delimiters */
+    line_args = strtok(line_copy, OP_DELIMITERS);
+
+    while (line_args != NULL) {
+        num_of_args++;
+        
+        /* get next token/arg */
+        line_args = strtok(NULL, OP_DELIMITERS);
+    }
+
+    /* discount operation name from count */
+    num_of_args--;
+
+    /* validate number of operands */
+    if (is_operands_num_valid(line, num_of_args)) {
+        fprintf(stderr, "Error in line %d: invalid number of operands\n", line_number);
+        num_of_args = OPERANDS_NUMBER_ERROR;
+    }
+
+    free(line_copy);
+    return num_of_args;
 }

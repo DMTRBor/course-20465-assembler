@@ -1,8 +1,12 @@
 #include "../hdr/first_pass.h"
 
 
-int run_first_pass(char *filename, int *ic, int *dc, MemoryUnit *mem, Label *labels) {
+int run_first_pass(char *filename, int *IC, int *DC, MemoryUnit *mem, Label *labels) {
     int line_number = 1;
+    int mem_units_cnt = 0;  /* memory units count */
+    /* number of words occupied by the operation and the operands */
+    int L = 0;
+
     /* use error cheking for content of .am file */
     int error_flag = FALSE;
     LineArg line_arg_type = ERROR;
@@ -37,23 +41,29 @@ int run_first_pass(char *filename, int *ic, int *dc, MemoryUnit *mem, Label *lab
         line_arg_type = detect_and_validate_first_arg(curr_line->line, line_number);
         line_number++;
 
+        if (mem_units_cnt > MEMORY_SIZE) {
+            fprintf(stderr, "Error in line %d: memory size exceeded\n", line_number);
+            error_flag = TRUE;
+            break;
+        }
+
         switch (line_arg_type) {
             case EMPTY_LINE:
             case COMMENT:
                 break;  /* ignore these lines */
 
             case LABEL:
-                is_label = TRUE;
+                // is_label = TRUE;
                 /* add to labels table */
 
                 break;
 
             case INSTRUCTION:
                 /* .entry will be completed in second pass */
-                if (is_extern()) {
+                // if (is_extern()) {
                     /* add label after .extern to labels table */
                     /* set type of label as external and value as 0 */
-                }
+                // }
                 break;
 
             case OPERATION:
@@ -73,11 +83,28 @@ int run_first_pass(char *filename, int *ic, int *dc, MemoryUnit *mem, Label *lab
                     // }
                 // }
 
-                /* parse operands */
-                
+                /* get number of operands */
+                L = get_num_of_operands(curr_line->line, line_number);
+                /* operands number is wrong */
+                if (L == OPERANDS_NUMBER_ERROR) {
+                    error_flag = TRUE;
+                    break;
+                }
+
+                /* check if operands are legal for this operation */
+                if (!is_operands_legal(curr_line->line, L)) {
+                    error_flag = TRUE;
+                    break;
+                }
 
                 /* encode operation and operands */
-
+                if (encode_operation(curr_line->line, L, mem) == STATUS_CODE_ERR) {
+                    error_flag = TRUE;
+                    break;
+                }
+                
+                *IC += L;  /* update instruction counter */
+                mem_units_cnt += L;  /* update memory units count */
                 break;
 
             default:
@@ -87,6 +114,12 @@ int run_first_pass(char *filename, int *ic, int *dc, MemoryUnit *mem, Label *lab
 
         /* go to next line */
         curr_line = curr_line->next;
+    }
+
+    /* errors found in file */
+    if (error_flag) {
+        free_list(curr_line);  /* free lines list */
+        return STATUS_CODE_ERR;
     }
     
     /* free used memory */

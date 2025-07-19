@@ -63,7 +63,7 @@ void add_mem_unit_to_table(MemoryUnit **tail, MemoryUnit *new_unit) {
 }
 
 
-void free_mem_list(MemoryUnit *head) {
+void free_mem_table(MemoryUnit *head) {
     MemoryUnit *current = head;
     MemoryUnit *next;
     
@@ -72,6 +72,27 @@ void free_mem_list(MemoryUnit *head) {
         free(current);
         current = next;
     }
+}
+
+
+int encode_operation(char *op_line, int num_of_operands, MemoryUnit *table) {
+    char *line_args;
+    char *line_copy;
+
+    /* copy line for processing */
+    line_copy = strdup(op_line);
+    /* tokenize with different delimiters */
+    line_args = strtok(line_copy, OP_DELIMITERS);
+
+    while (line_args != NULL) {        
+        /* get next token/arg */
+        line_args = strtok(NULL, OP_DELIMITERS);
+    }
+    
+    // set_word_fields(unit, encoding_type, dest_operand, src_operand, opcode);
+
+    free(line_copy);
+    return STATUS_CODE_OK;
 }
 
 
@@ -87,6 +108,7 @@ Label* new_label(void) {
     new_label->type = CODE;
     new_label->name = NULL;
     new_label->address = 0;
+    new_label->next = NULL;
     
     return new_label;
 }
@@ -105,29 +127,49 @@ void set_label_fields(Label *label, int type, char *name, unsigned int address) 
 }
 
 
-void free_label(Label *label) {
-    if (label == NULL)
-        return;
+void free_labels_table(Label *head) {
+    Label *current = head;
+    Label *next;
     
-    if (label->name != NULL)
-        free(label->name);
-
-    free(label);
+    while (current != NULL) {
+        next = current->next;
+        
+        if (current->name != NULL)
+            free(current->name);
+        
+        free(current);
+        current = next;
+    }
 }
 
 
-int is_label_exist(Label *label, Label *table, int size) {
-    int id;
+void add_label_to_table(Label **tail, Label *new_label) {
+    if (tail == NULL || new_label == NULL)
+        return;
     
-    if (table == NULL || label == NULL)
+    if (*tail == NULL)
+        *tail = new_label;
+    else {
+        (*tail)->next = new_label;
+        *tail = new_label;
+    }
+}
+
+
+int is_label_exist(Label *label, Label *head) {
+    Label *current = head;
+    
+    if (head == NULL || label == NULL)
         return FALSE;
     
-    for (id = 0; id < size; id++) {
-        if (table[id].type == label->type &&
-            table[id].address == label->address &&
-            strcmp(table[id].name, label->name) == STR_EQUAL) {
+    /* search in labels table */
+    while (current != NULL) {
+        if (current->type == label->type &&
+            current->address == label->address &&
+            strcmp(current->name, label->name) == STR_EQUAL) {
             return TRUE;  /* label exists */
         }
+        current = current->next;
     }
     
     return FALSE;  /* label not found */

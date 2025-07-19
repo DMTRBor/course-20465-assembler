@@ -58,6 +58,7 @@ extern struct operation operations[];
 extern const char *instructions[];
 extern const char *registers[];
 extern LegalAddrMethods legal_addressing_methods[];
+extern ExpectedNumOfOperands expected_num_of_operands[];
 
 
 #define MEMORY_SIZE 256

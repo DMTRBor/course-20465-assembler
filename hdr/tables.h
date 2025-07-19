@@ -20,6 +20,7 @@ typedef struct Label {
     int type;  /* CODE or DATA */
     char *name;
     unsigned int address;
+    struct Label *next;  /* pointer to next label */
 } Label;
 
 
@@ -45,12 +46,14 @@ void set_word_fields(MemoryUnit *,
                      unsigned int, 
                      unsigned int);
 void add_mem_unit_to_table(MemoryUnit **, MemoryUnit *);
-void free_mem_list(MemoryUnit *head);
+void free_mem_table(MemoryUnit *head);
+int encode_operation(char *, int, MemoryUnit *);
 
 /* ----------- Labels Table Functions ----------- */
 Label* new_label(void);
 void set_label_fields(Label *, int, char *, unsigned int);
-void free_label(Label *);
-int is_label_exist(Label *, Label *, int);
+void free_labels_table(Label *);
+void add_label_to_table(Label **, Label *);
+int is_label_exist(Label *, Label *);
 
 #endif
