@@ -119,29 +119,7 @@ LineArg detect_arg_type(char *line) {
 }
 
 
-/* -------------------------- Macro -------------------------- */
-
-/**
- * This function gets a pointer to a
- * line read from file, that has a
- * pre-defined maximum length and a
- * pointer to a file stream and checks
- * if the line is too long (if newline
- * is not found in characters, the line
- * is longer than expected). The function
- * returns TRUE code if the line is too
- * long and FALSE code otherwise.
- */
-int line_too_long(char *line, FILE *fp) {
-    /* count line characters until
-       newline (if exists) */
-    size_t line_length = strcspn(line, NEWLINE_STR);
-
-    /* newline not found at the end of the
-       line and not reached EOF */
-    return (line[line_length] != NEWLINE_CHAR && !feof(fp));
-}
-
+/* -------------------------- Pre-Assembler -------------------------- */
 
 char* get_macro_name(char *line) {
     char *line_args;
@@ -186,4 +164,71 @@ int is_macro_call(char *line, char *macro_name) {
 
     free(line_copy);
     return FALSE;
+}
+
+
+/* -------------------------- First / Second Pass -------------------------- */
+
+int is_operation(char *arg) {
+    int id;  /* array index */
+
+    /* check if argument is an operation */
+    for (id = 0; id < NUM_OF_OPERATIONS; id++) {
+        if (strcmp(arg, operations[id].name) == STR_EQUAL) {
+            return TRUE;
+        }
+    }
+
+    return FALSE;  /* not an operation */
+}
+
+
+int is_instruction(char *arg) {
+    int id;  /* array index */
+
+    /* check if argument is an instruction */
+    for (id = 0; id < NUM_OF_INSTRUCTIONS; id++) {
+        if (strcmp(arg, instructions[id]) == STR_EQUAL) {
+            return TRUE;
+        }
+    }
+
+    return FALSE;  /* not an instruction */
+}
+
+
+LineArg get_operand_type(char *operand) {
+    LineArg line_arg_type = ERROR;
+
+    
+
+    return line_arg_type;
+}
+
+
+unsigned int get_operand_code_from_type(LineArg operand_type) {
+    if (operand_type == IMMEDIATE_ADDR)
+        return IMMEDIATE;
+    else if (operand_type == DIRECT_ADDR)
+        return DIRECT;
+    else if (operand_type == MATRIX_ADDR)
+        return MAT;
+    else if (operand_type == REGISTER_ADDR)
+        return REG;
+}
+
+
+void set_word_operand_field(LineArg operand_type,
+                            int arg_id,
+                            int num_of_operands, 
+                            unsigned int *dest_operand,
+                            unsigned int *src_operand) {
+    if (num_of_operands == DEST_ONLY)
+        *dest_operand = get_operand_code_from_type(operand_type);
+    else if (num_of_operands == SRC_AND_DEST) {
+        if (arg_id == FIRST_ARG_ID)
+            *src_operand = get_operand_code_from_type(operand_type);
+        else if (arg_id == SEC_ARG_ID)
+            *dest_operand = get_operand_code_from_type(operand_type);
+    }
 }

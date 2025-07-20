@@ -61,34 +61,6 @@ int is_macro_args_num_valid(char *line, int num_of_expected_args) {
 
 /* -------------------------- First / Second Pass -------------------------- */
 
-int is_operation(char *arg) {
-    int id;  /* array index */
-
-    /* check if argument is an operation */
-    for (id = 0; id < NUM_OF_OPERATIONS; id++) {
-        if (strcmp(arg, operations[id].name) == STR_EQUAL) {
-            return TRUE;
-        }
-    }
-
-    return FALSE;  /* not an operation */
-}
-
-
-int is_instruction(char *arg) {
-    int id;  /* array index */
-
-    /* check if argument is an instruction */
-    for (id = 0; id < NUM_OF_INSTRUCTIONS; id++) {
-        if (strcmp(arg, instructions[id]) == STR_EQUAL) {
-            return TRUE;
-        }
-    }
-
-    return FALSE;  /* not an instruction */
-}
-
-
 int is_valid_label(char *arg, int line_number) {
     int id;  /* array index */
 
@@ -220,43 +192,6 @@ int get_num_of_operands(char *line, int line_number) {
 
     free(line_copy);
     return num_of_args;
-}
-
-
-LineArg get_operand_type(char *operand) {
-    LineArg line_arg_type = ERROR;
-
-    
-
-    return line_arg_type;
-}
-
-
-unsigned int get_operand_code_from_type(LineArg operand_type) {
-    if (operand_type == IMMEDIATE_ADDR)
-        return IMMEDIATE;
-    else if (operand_type == DIRECT_ADDR)
-        return DIRECT;
-    else if (operand_type == MATRIX_ADDR)
-        return MAT;
-    else if (operand_type == REGISTER_ADDR)
-        return REG;
-}
-
-
-void set_word_operand_field(LineArg operand_type,
-                            int arg_id,
-                            int num_of_operands, 
-                            unsigned int *dest_operand,
-                            unsigned int *src_operand) {
-    if (num_of_operands == DEST_ONLY)
-        *dest_operand = get_operand_code_from_type(operand_type);
-    else if (num_of_operands == SRC_AND_DEST) {
-        if (arg_id == FIRST_ARG_ID)
-            *src_operand = get_operand_code_from_type(operand_type);
-        else if (arg_id == SEC_ARG_ID)
-            *dest_operand = get_operand_code_from_type(operand_type);
-    }
 }
 
 

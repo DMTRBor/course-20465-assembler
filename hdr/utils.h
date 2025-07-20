@@ -6,17 +6,19 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "../hdr/machine.h"
+
 /* one last character is null terminator */
 #define MAX_FNAME_LEN 51
 #define MAX_LINE_LEN 81
 #define REG_NAME_LEN 2
 
-#define IC_DC_RESET_VALUE 0
-
 #define MIN_ALLOWED_ARGS 2
 
 #define BASE_4 4
 #define BASE_10 10
+
+#define STR_EQUAL 0
 
 /* delimiters and hallmarks */
 #define MACRO_START "mcro"
@@ -38,8 +40,7 @@
 #define COMMA ','
 #define ZERO '0'
 
-#define STR_EQUAL 0
-
+/* file permissions */
 #define READ_FILE_PERMISSION "r"
 #define WRITE_FILE_PERMISSION "w"
 
@@ -49,6 +50,14 @@
 #define OBJECT_FILE_EXTEN ".ob"
 #define EXTERNAL_FILE_EXTEN ".ext"
 #define ENTRIES_FILE_EXTEN ".ent"
+
+/* args and operators indices */
+#define FIRST_ARG_ID 1
+#define SEC_ARG_ID 2
+#define DEST_ONLY 1
+#define SRC_AND_DEST 2
+
+#define IC_DC_RESET_VALUE 0
 
 
 enum {
@@ -84,11 +93,17 @@ void decimal_to_base4(char *, char *);
 
 long file_content_size(FILE*);
 FILE* open_file(char *, char *);
-int line_too_long(char *, FILE *);
 
+/* Pre-Assembler */
 LineArg detect_arg_type(char *);
-
 char* get_macro_name(char *);
 int is_macro_call(char *, char *);
+
+/* First/Second Pass */
+int is_operation(char *);
+int is_instruction(char *);
+LineArg get_operand_type(char *);
+unsigned int get_operand_code_from_type(LineArg);
+void set_word_operand_field(LineArg, int, int, unsigned int *, unsigned int *);
 
 #endif

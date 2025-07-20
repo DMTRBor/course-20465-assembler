@@ -51,7 +51,9 @@ Line* file_to_list(FILE *fp) {
     char line[MAX_LINE_LEN];
 
     while (fgets(line, sizeof(line), fp) != NULL) {
-        if (line_too_long(line, fp)) {
+        /* count line characters until newline (if exists) and check if */
+        /* newline not found at the end of the line and not reached EOF */
+        if (line[strcspn(line, NEWLINE_STR)] != NEWLINE_CHAR && !feof(fp)) {
             fprintf(stderr, "Line too long in file, max length is %d characters\n", MAX_LINE_LEN - 1);
             return NULL;
         }
