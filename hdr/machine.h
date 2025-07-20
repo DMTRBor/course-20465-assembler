@@ -21,6 +21,13 @@ typedef struct {
 } ExpectedNumOfOperands;
 
 
+typedef enum {
+    A,  /* Absolute */
+    E,  /* External */
+    R   /* Relocatable */
+} EncodingType;
+
+
 /* word memory structure */
 typedef struct {
     unsigned int encoding_type : 2;   /* E,R,A - bits 0-1 */

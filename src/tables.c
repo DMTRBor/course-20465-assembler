@@ -75,27 +75,6 @@ void free_mem_table(MemoryUnit *head) {
 }
 
 
-int encode_operation(char *op_line, int num_of_operands, MemoryUnit *table) {
-    char *line_args;
-    char *line_copy;
-
-    /* copy line for processing */
-    line_copy = strdup(op_line);
-    /* tokenize with different delimiters */
-    line_args = strtok(line_copy, OP_DELIMITERS);
-
-    while (line_args != NULL) {        
-        /* get next token/arg */
-        line_args = strtok(NULL, OP_DELIMITERS);
-    }
-    
-    // set_word_fields(unit, encoding_type, dest_operand, src_operand, opcode);
-
-    free(line_copy);
-    return STATUS_CODE_OK;
-}
-
-
 /* ---------------------------- Labels Table ---------------------------- */
 
 Label* new_label(void) {

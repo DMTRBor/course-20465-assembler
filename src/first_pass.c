@@ -4,6 +4,7 @@
 int run_first_pass(char *filename, int *IC, int *DC, MemoryUnit *mem, Label *labels) {
     int line_number = 1;
     int mem_units_cnt = 0;  /* memory units count */
+    int num_of_operands = 0;  /* number of operands in operation */
     /* number of words occupied by the operation and the operands */
     int L = 0;
 
@@ -18,6 +19,8 @@ int run_first_pass(char *filename, int *IC, int *DC, MemoryUnit *mem, Label *lab
 
     Line *curr_line = NULL;  /* lines list */
     Label *curr_label = NULL;  /* current label */
+    /* save pointer to first memory unit */
+    MemoryUnit *first_mem_unit = mem;
 
     /* add macro-parsed file extension */
     strcpy(am_filename, filename);
@@ -83,22 +86,19 @@ int run_first_pass(char *filename, int *IC, int *DC, MemoryUnit *mem, Label *lab
                     // }
                 // }
 
-                /* get number of operands */
-                L = get_num_of_operands(curr_line->line, line_number);
-                /* operands number is wrong */
-                if (L == OPERANDS_NUMBER_ERROR) {
+                /* validate operands number */
+                if ((num_of_operands = get_num_of_operands(curr_line->line, line_number)) == OPERANDS_NUM_ERROR) {
                     error_flag = TRUE;
                     break;
                 }
-
                 /* check if operands are legal for this operation */
                 if (!is_operands_legal(curr_line->line, L)) {
                     error_flag = TRUE;
                     break;
                 }
-
                 /* encode operation and operands */
-                if (encode_operation(curr_line->line, L, mem) == STATUS_CODE_ERR) {
+                if ((L = encode_op_sentence(curr_line->line, num_of_operands,
+                                            mem, line_number)) == WORDS_NUM_ERROR) {
                     error_flag = TRUE;
                     break;
                 }

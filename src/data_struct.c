@@ -16,11 +16,12 @@ Line* new_line(char *line) {
 
 
 void delete_line_from_list(Line *curr) {
+    Line *temp = NULL;
     /* last line will not be deleted */
     if (curr == NULL || curr->next == NULL)
         return;
 
-    Line *temp = curr->next;
+    temp = curr->next;
 
     /* copy next line's data into current ptr */
     free(curr->line);
@@ -34,8 +35,10 @@ void delete_line_from_list(Line *curr) {
 
 
 void free_list(Line *curr) {
+    Line *temp = NULL;
+
     while (curr != NULL) {
-        Line *temp = curr;
+        temp = curr;
         curr = curr->next;
         free(temp->line);
         free(temp);
@@ -44,7 +47,7 @@ void free_list(Line *curr) {
 
 
 Line* file_to_list(FILE *fp) {
-    Line *start = NULL, *end = NULL;
+    Line *start = NULL, *end = NULL, *new = NULL;
     char line[MAX_LINE_LEN];
 
     while (fgets(line, sizeof(line), fp) != NULL) {
@@ -54,7 +57,7 @@ Line* file_to_list(FILE *fp) {
         }
         /* cut ending new line */
         line[strcspn(line, NEWLINE_STR)] = NULL_TERMINATOR;
-        Line *new = new_line(line);
+        new = new_line(line);
 
         if (start == NULL)
             start = end = new;
@@ -104,6 +107,7 @@ Macro* init_macro_list(char *mcro_name) {
 
 
 void add_line_to_macro(Macro *mcro, Line *line) {
+    Line *curr = NULL;
     /* allocate line for copy */
     Line *new_line = malloc(sizeof(Line));
     /* check if allocated properly */
@@ -119,7 +123,7 @@ void add_line_to_macro(Macro *mcro, Line *line) {
         mcro->line = new_line;
     else {
         /* traverse to the end and append */
-        Line *curr = mcro->line;
+        curr = mcro->line;
 
         while (curr->next != NULL) {
             curr = curr->next;
@@ -131,13 +135,13 @@ void add_line_to_macro(Macro *mcro, Line *line) {
 
 
 Line *copy_macro_lines(Line *origin_lines) {
+    Line *copy_head = NULL, *copy_tail = NULL, *new_line = NULL;
+
     if (origin_lines == NULL)
         return NULL;
 
-    Line *copy_head = NULL, *copy_tail = NULL;
-
     while (origin_lines != NULL) {
-        Line *new_line = malloc(sizeof(Line));
+        new_line = malloc(sizeof(Line));
         /* check if allocated properly */
         if (new_line == NULL)
             return NULL;
@@ -160,16 +164,18 @@ Line *copy_macro_lines(Line *origin_lines) {
 
 
 void insert_macro_in_list(Line *line, Macro *macro) {
+    Line *macro_copy = NULL, *macro_tail = NULL;
+    /* check if line and macro are valid */
     if (line == NULL || macro == NULL || macro->line == NULL)
         return;
 
     /* use copy of macro for reusal in repeated calls */
-    Line *macro_copy = copy_macro_lines(macro->line);
+    macro_copy = copy_macro_lines(macro->line);
     /* validate copying */
     if (macro_copy == NULL)
         return;
 
-    Line *macro_tail = macro_copy;
+    macro_tail = macro_copy;
 
     /* find last line in macro */
     while (macro_tail->next)
@@ -194,9 +200,10 @@ void insert_macro_in_list(Line *line, Macro *macro) {
 
 void free_macro(Macro *mcro) {
     Line *curr = mcro->line;
+    Line *temp = NULL;
 
     while (curr != NULL) {
-        Line *temp = curr;
+        temp = curr;
         curr = curr->next;
         free(temp->line);
         free(temp);

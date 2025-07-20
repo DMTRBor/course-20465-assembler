@@ -23,7 +23,7 @@
 #define MACRO_END "mcroend"
 #define LABEL_SIGN ":"
 #define INSTRUCTION_SIGN "."
-#define DIRECT_ADDR_SIGN "#"
+#define DIRECT_ADDR_SIGN '#'
 #define REGISTER_PREFIX "r"
 #define MATRIX_LEFT_BRACE "["
 #define MATRIX_RIGHT_BRACE "]"
@@ -71,9 +71,10 @@ typedef enum {
     LABEL,
     OPERATION,
     INSTRUCTION,
+    IMMEDIATE_ADDR,
     DIRECT_ADDR,
-    REGISTER,
-    MATRIX,
+    REGISTER_ADDR,
+    MATRIX_ADDR,
     ERROR
 } LineArg;
 

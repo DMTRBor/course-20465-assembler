@@ -112,40 +112,6 @@ int is_valid_label(char *arg, int line_number) {
 }
 
 
-/**
- * This function receives a line
- */
-LineArg detect_and_validate_first_arg(char *line, int line_number) {
-    char *line_args;
-    char *line_copy;
-    LineArg line_arg_type = ERROR;
-
-    /* copy line for processing */
-    line_copy = strdup(line);
-    /* tokenize with whitespaces */
-    line_args = strtok(line_copy, WHITESPACE);
-
-    if (*line == NULL_TERMINATOR || strcmp(line_args, NEWLINE_STR) == STR_EQUAL) {
-        line_arg_type = EMPTY_LINE;
-    }
-    else if (line_args[0] == COMMENT_SIGN) {
-        line_arg_type = COMMENT;
-    }
-    else if (is_operation(line_args)) {
-        line_arg_type = OPERATION;
-    }
-    else if (is_instruction(line_args)) {
-        line_arg_type = INSTRUCTION;
-    }
-    else if (is_valid_label(line_args, line_number)) {
-        line_arg_type = LABEL;
-    }
-
-    free(line_copy);
-    return line_arg_type;
-}
-
-
 int is_operands_num_valid(char *line, int num_of_operands) {
     char *line_args;
     char *line_copy;
@@ -184,6 +150,8 @@ int is_operands_legal(char *line, int num_of_operands) {
     operation_name = strtok(line_copy, WHITESPACE);
 
     /* TODO */
+    free(line_copy);
+    return TRUE;
 
     /* operation not found */
     free(line_copy);
@@ -191,10 +159,39 @@ int is_operands_legal(char *line, int num_of_operands) {
 }
 
 
-/**
- * This function receives a line and line number, parses line arguments 
- * with different delimiters and returns the total number of arguments.
- */
+/* ---------------------------------------------------------------------- */
+
+LineArg detect_and_validate_first_arg(char *line, int line_number) {
+    char *line_args;
+    char *line_copy;
+    LineArg line_arg_type = ERROR;
+
+    /* copy line for processing */
+    line_copy = strdup(line);
+    /* tokenize with whitespaces */
+    line_args = strtok(line_copy, WHITESPACE);
+
+    if (*line == NULL_TERMINATOR || strcmp(line_args, NEWLINE_STR) == STR_EQUAL) {
+        line_arg_type = EMPTY_LINE;
+    }
+    else if (line_args[0] == COMMENT_SIGN) {
+        line_arg_type = COMMENT;
+    }
+    else if (is_operation(line_args)) {
+        line_arg_type = OPERATION;
+    }
+    else if (is_instruction(line_args)) {
+        line_arg_type = INSTRUCTION;
+    }
+    else if (is_valid_label(line_args, line_number)) {
+        line_arg_type = LABEL;
+    }
+
+    free(line_copy);
+    return line_arg_type;
+}
+
+
 int get_num_of_operands(char *line, int line_number) {
     char *line_args;
     char *line_copy;
@@ -216,11 +213,157 @@ int get_num_of_operands(char *line, int line_number) {
     num_of_args--;
 
     /* validate number of operands */
-    if (is_operands_num_valid(line, num_of_args)) {
+    if (!is_operands_num_valid(line, num_of_args)) {
         fprintf(stderr, "Error in line %d: invalid number of operands\n", line_number);
-        num_of_args = OPERANDS_NUMBER_ERROR;
+        num_of_args = OPERANDS_NUM_ERROR;
     }
 
     free(line_copy);
     return num_of_args;
+}
+
+
+LineArg get_operand_type(char *operand) {
+    LineArg line_arg_type = ERROR;
+
+    
+
+    return line_arg_type;
+}
+
+
+unsigned int get_operand_code_from_type(LineArg operand_type) {
+    if (operand_type == IMMEDIATE_ADDR)
+        return IMMEDIATE;
+    else if (operand_type == DIRECT_ADDR)
+        return DIRECT;
+    else if (operand_type == MATRIX_ADDR)
+        return MAT;
+    else if (operand_type == REGISTER_ADDR)
+        return REG;
+}
+
+
+void set_word_operand_field(LineArg operand_type,
+                            int arg_id,
+                            int num_of_operands, 
+                            unsigned int *dest_operand,
+                            unsigned int *src_operand) {
+    if (num_of_operands == DEST_ONLY)
+        *dest_operand = get_operand_code_from_type(operand_type);
+    else if (num_of_operands == SRC_AND_DEST) {
+        if (arg_id == FIRST_ARG_ID)
+            *src_operand = get_operand_code_from_type(operand_type);
+        else if (arg_id == SEC_ARG_ID)
+            *dest_operand = get_operand_code_from_type(operand_type);
+    }
+}
+
+
+/* --------------------------------- Encoding --------------------------------- */
+
+int encode_operation(MemoryUnit *table,
+                     char *op_name,
+                     unsigned int dest_operand,
+                     unsigned int src_operand,
+                     int line_number) {
+    int id;  /* array index */
+    unsigned int encoding_type, opcode;
+
+    /* search for operation in operations table */
+    for (id = 0; id < NUM_OF_OPERATIONS; id++) {
+        if (strcmp(op_name, operations[id].name) == STR_EQUAL) {
+            /* allocate new memory unit */
+            table = table->next;
+            table = new_mem_unit();
+
+            if (table == NULL) {
+                fprintf(stderr, "Memory allocation error in line %d\n", line_number);
+                return STATUS_CODE_ERR;  /* memory allocation failed */
+            }
+
+            /* found operation, encode it */
+            encoding_type = A;
+            opcode = operations[id].code;
+            /* set fields in memory unit */
+            set_word_fields(table,
+                            encoding_type,
+                            dest_operand,
+                            src_operand,
+                            opcode);
+            return STATUS_CODE_OK;
+        }
+    }
+
+    fprintf(stderr, "Error in line %d: unknown operation '%s'\n", line_number, op_name);
+    return STATUS_CODE_ERR;  /* unknown operation */
+}
+
+
+int encode_op_sentence(char *op_line,
+                       int num_of_operands,
+                       MemoryUnit *table,
+                       int line_number) {
+    char *line_args, *line_copy, *op_name;
+    LineArg line_arg_type;
+
+    /* word fields -initialize with zeros */
+    unsigned int encoding_type = A;
+    unsigned int dest_operand = IMMEDIATE;
+    unsigned int src_operand = IMMEDIATE;
+    unsigned int opcode = operations[0].code;
+
+    /* words and args counter */
+    int L = 0, arg_id = 0;
+
+    /* copy line for processing */
+    line_copy = strdup(op_line);
+    /* tokenize with different delimiters */
+    line_args = strtok(line_copy, OP_DELIMITERS);
+    
+    /* extract info for operation encoding */
+    while (line_args != NULL) {
+        if (arg_id == FIRST_ARG)  /* get operation name */
+            op_name = strdup(line_args);
+        else {
+            if ((line_arg_type = get_operand_type(line_args)) == ERROR) {
+                fprintf(stderr, "Error in line %d: invalid operand type\n", line_number);
+                free(line_copy);
+                free(op_name);
+                return WORDS_NUM_ERROR;  /* invalid operand type */
+            }
+
+            /* set operand field based on type */
+            set_word_operand_field(line_arg_type, arg_id, num_of_operands,
+                                   &dest_operand, &src_operand);
+        }
+
+        /* get next token/arg */
+        line_args = strtok(NULL, OP_DELIMITERS);
+        arg_id++;
+    }
+
+    /* encode operation */
+    if (encode_operation(table, op_name, dest_operand, src_operand, line_number) == STATUS_CODE_ERR) {
+        free(line_copy);
+        free(op_name);
+        return WORDS_NUM_ERROR;  /* encoding failed */
+    }
+    /* count encoded operation */
+    L++;
+
+    /* encode operands */
+
+
+    /* check if number of words is not exceeded */
+    if (L > MAX_WORDS_IN_SENTENCE) {
+        fprintf(stderr, "Error in line %d: too many words in sentence\n", line_number);
+        free(line_copy);
+        free(op_name);
+        return WORDS_NUM_ERROR;
+    }
+
+    free(line_copy);
+    free(op_name);
+    return L;
 }
