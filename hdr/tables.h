@@ -9,7 +9,7 @@
 
 
 /* machine code type */
-typedef enum {
+enum SectionType {
     CODE,
     DATA
 };

@@ -8,7 +8,7 @@ struct operation {
 };
 
 
-typedef enum {
+enum OpNumOfOperands{
     NO_OPERANDS,
     SINGLE_OPERAND,
     TWO_OPERANDS
