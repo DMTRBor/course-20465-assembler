@@ -1,7 +1,7 @@
 #include "../hdr/first_pass.h"
 
 
-int run_first_pass(char *filename, int *IC, int *DC, MemoryUnit *mem, Label *labels) {
+int run_first_pass(char *filename, int *IC, int *DC, MemoryUnit **mem, Label **labels) {
     int line_number = 1;
     int mem_units_cnt = 0;  /* memory units count */
     int num_of_operands = 0;  /* number of operands in operation */
@@ -20,7 +20,7 @@ int run_first_pass(char *filename, int *IC, int *DC, MemoryUnit *mem, Label *lab
     Line *curr_line = NULL;  /* lines list */
     Label *curr_label = NULL;  /* current label */
     /* save pointer to first memory unit */
-    MemoryUnit *first_mem_unit = mem;
+    MemoryUnit **first_mem_unit = mem;
 
     /* add macro-parsed file extension */
     strcpy(am_filename, filename);

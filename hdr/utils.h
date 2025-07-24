@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <math.h>
 
 #include "../hdr/machine.h"
@@ -25,15 +26,15 @@
 #define MACRO_END "mcroend"
 #define LABEL_SIGN ":"
 #define INSTRUCTION_SIGN "."
-#define DIRECT_ADDR_SIGN '#'
+#define IMMEDIATE_ADDR_SIGN '#'
 #define REGISTER_PREFIX "r"
-#define MATRIX_LEFT_BRACE "["
-#define MATRIX_RIGHT_BRACE "]"
+#define MAT_LEFT_BRACE '['
+#define MAT_RIGHT_BRACE ']'
 #define COMMENT_SIGN ';'
 #define NEWLINE_STR "\n"
 
 #define WHITESPACE " \t"
-#define OP_DELIMITERS " \t\r[],"
+#define OP_DELIMITERS " \t\r,"
 #define NEWLINE_CHAR '\n'
 #define NULL_TERMINATOR '\0'
 #define UNDERSCORE '_'
@@ -102,6 +103,7 @@ int is_macro_call(char *, char *);
 /* First/Second Pass */
 int is_operation(char *);
 int is_instruction(char *);
+int is_register(char *);
 LineArg get_operand_type(char *);
 unsigned int get_operand_code_from_type(LineArg);
 void set_word_operand_field(LineArg, int, int, unsigned int *, unsigned int *);

@@ -197,12 +197,47 @@ int is_instruction(char *arg) {
 }
 
 
+int is_register(char *arg) {
+    int id;  /* array index */
+
+    /* check if argument is a register */
+    for (id = 0; id < NUM_OF_REGISTERS; id++) {
+        if (strcmp(arg, registers[id]) == STR_EQUAL)
+            return TRUE;
+    }
+
+    return FALSE;  /* not a register */
+}
+
+
 LineArg get_operand_type(char *operand) {
-    LineArg line_arg_type = ERROR;
-
+    LineArg operand_type = ERROR;
+    int id;
     
+    /* check for immediate addressing */
+    if (strchr(operand, IMMEDIATE_ADDR_SIGN) != NULL)
+        operand_type = IMMEDIATE_ADDR;
 
-    return line_arg_type;
+    /* check for matrix addressing */
+    else if (strchr(operand, MAT_LEFT_BRACE) != NULL && strchr(operand, MAT_RIGHT_BRACE) != NULL)
+        operand_type = MATRIX_ADDR;
+
+    /* check if it's a register addressing */
+    else {
+        if (is_register(operand))
+            operand_type = REGISTER_ADDR;
+        else {
+            /* check if direct addressing (label) */
+            for (id = 0; operand[id] != NULL_TERMINATOR; id++) {
+                if (isalnum(operand[id])) {  /* possibly a label */
+                    operand_type = DIRECT_ADDR;
+                    break;
+                }
+            }
+        }
+    }
+
+    return operand_type;
 }
 
 

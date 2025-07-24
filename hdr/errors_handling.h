@@ -28,7 +28,7 @@ LineArg detect_and_validate_first_arg(char *, int);
 int get_num_of_operands(char *, int);
 
 /* Encoding */
-int encode_operation(MemoryUnit *, char *, unsigned int, unsigned int, int);
-int encode_op_sentence(char *, int, MemoryUnit *, int);
+int encode_operation(MemoryUnit **, char *, unsigned int, unsigned int, int);
+int encode_op_sentence(char *, int, MemoryUnit **, int);
 
 #endif

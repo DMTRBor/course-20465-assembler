@@ -197,22 +197,22 @@ int get_num_of_operands(char *line, int line_number) {
 
 /* --------------------------------- Encoding --------------------------------- */
 
-int encode_operation(MemoryUnit *table,
+int encode_operation(MemoryUnit **table,
                      char *op_name,
                      unsigned int dest_operand,
                      unsigned int src_operand,
                      int line_number) {
     int id;  /* array index */
     unsigned int encoding_type, opcode;
+    MemoryUnit *new;
 
     /* search for operation in operations table */
     for (id = 0; id < NUM_OF_OPERATIONS; id++) {
         if (strcmp(op_name, operations[id].name) == STR_EQUAL) {
             /* allocate new memory unit */
-            table = table->next;
-            table = new_mem_unit();
+            new = new_mem_unit();
 
-            if (table == NULL) {
+            if (new == NULL) {
                 fprintf(stderr, "Memory allocation error in line %d\n", line_number);
                 return STATUS_CODE_ERR;  /* memory allocation failed */
             }
@@ -221,11 +221,14 @@ int encode_operation(MemoryUnit *table,
             encoding_type = A;
             opcode = operations[id].code;
             /* set fields in memory unit */
-            set_word_fields(table,
+            set_word_fields(new,
                             encoding_type,
                             dest_operand,
                             src_operand,
                             opcode);
+            /* add to table */
+            add_mem_unit_to_table(table, new);
+            
             return STATUS_CODE_OK;
         }
     }
@@ -237,10 +240,10 @@ int encode_operation(MemoryUnit *table,
 
 int encode_op_sentence(char *op_line,
                        int num_of_operands,
-                       MemoryUnit *table,
+                       MemoryUnit **table,
                        int line_number) {
     char *line_args, *line_copy, *op_name;
-    LineArg line_arg_type;
+    LineArg operand_type;
 
     /* word fields -initialize with zeros */
     unsigned int encoding_type = A;
@@ -261,15 +264,15 @@ int encode_op_sentence(char *op_line,
         if (arg_id == FIRST_ARG)  /* get operation name */
             op_name = strdup(line_args);
         else {
-            if ((line_arg_type = get_operand_type(line_args)) == ERROR) {
-                fprintf(stderr, "Error in line %d: invalid operand type\n", line_number);
+            if ((operand_type = get_operand_type(line_args)) == ERROR) {
+                fprintf(stderr, "Error in line %d: invalid operand type - %s\n", line_number, line_args);
                 free(line_copy);
                 free(op_name);
                 return WORDS_NUM_ERROR;  /* invalid operand type */
             }
 
             /* set operand field based on type */
-            set_word_operand_field(line_arg_type, arg_id, num_of_operands,
+            set_word_operand_field(operand_type, arg_id, num_of_operands,
                                    &dest_operand, &src_operand);
         }
 

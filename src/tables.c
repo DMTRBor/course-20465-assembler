@@ -50,15 +50,21 @@ void set_word_fields(MemoryUnit *unit,
 }
 
 
-void add_mem_unit_to_table(MemoryUnit **tail, MemoryUnit *new_unit) {
-    if (tail == NULL || new_unit == NULL)
+void add_mem_unit_to_table(MemoryUnit **head, MemoryUnit *new) {
+    MemoryUnit *current;
+    
+    if (head == NULL || new == NULL)
         return;
     
-    if (*tail == NULL)
-        *tail = new_unit;
+    if (*head == NULL)
+        *head = new;
     else {
-        (*tail)->next = new_unit;
-        *tail = new_unit;
+        current = *head;
+
+        while (current->next != NULL)
+            current = current->next;
+
+        current->next = new;
     }
 }
 

@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
             MemoryUnit *mem = NULL;  /* memory map */
             Label *labels = NULL;  /* labels map */
     
-            if (run_first_pass(argv[arg_id], &ic_value, &dc_value, mem, labels) == STATUS_CODE_OK) {
+            if (run_first_pass(argv[arg_id], &ic_value, &dc_value, &mem, &labels) == STATUS_CODE_OK) {
                 fprintf(stdout, "Running second pass for: %s\n", filename);
                 /* second pass - using final IC and DC values */
                 /* run_second_pass(argv[arg_id], &ic_value, &dc_value); */

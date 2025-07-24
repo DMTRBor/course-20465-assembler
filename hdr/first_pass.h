@@ -9,6 +9,6 @@
 #include "../hdr/errors_handling.h"
 
 
-int run_first_pass(char *, int *, int *, MemoryUnit *, Label *);
+int run_first_pass(char *, int *, int *, MemoryUnit **, Label **);
 
 #endif
