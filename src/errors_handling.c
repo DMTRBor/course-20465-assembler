@@ -84,7 +84,7 @@ int is_valid_label(char *arg, int line_number) {
 
 
 int is_operands_num_valid(char *line, int num_of_operands) {
-    char *line_args, *line_copy;
+    char *line_copy;
     char *operation_name;
     int id;
 
@@ -133,7 +133,7 @@ int is_operand_value_legal(char *operand, int line_number) {
 }
 
 
-int is_src_addr_method_valid(char *op_name, unsigned int src_operand, int op_id) {
+int is_src_addr_method_valid(unsigned int src_operand, int op_id) {
     switch (src_operand) {
         case IMMEDIATE:
             if (!legal_addressing_methods[op_id].legal_src_addr_method.immediate_addressing)
@@ -157,7 +157,7 @@ int is_src_addr_method_valid(char *op_name, unsigned int src_operand, int op_id)
 }
 
 
-int is_dest_addr_method_valid(char *op_name, unsigned int dest_operand, int op_id) {
+int is_dest_addr_method_valid(unsigned int dest_operand, int op_id) {
     switch (dest_operand) {
         case IMMEDIATE:
             if (!legal_addressing_methods[op_id].legal_dst_addr_method.immediate_addressing)
@@ -191,12 +191,12 @@ int is_legal_addressing_methods(char *op_name, unsigned int dest_operand,
         if (strcmp(op_name, legal_addressing_methods[id].oper->name) == STR_EQUAL) {
             /* check source and destination operand addressing methods */
             if (num_of_operands == DEST_ONLY) {
-                if (!is_dest_addr_method_valid(op_name, dest_operand, id))
+                if (!is_dest_addr_method_valid(dest_operand, id))
                     return FALSE;  /* illegal destination addressing method found */
             }
             else if (num_of_operands == SRC_AND_DEST) {
-                if (!is_src_addr_method_valid(op_name, src_operand, id) ||
-                    !is_dest_addr_method_valid(op_name, dest_operand, id)) {
+                if (!is_src_addr_method_valid(src_operand, id) ||
+                    !is_dest_addr_method_valid(dest_operand, id)) {
                     return FALSE;  /* illegal addressing method found */
                 }
             }

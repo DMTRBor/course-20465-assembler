@@ -185,8 +185,6 @@ int encode_operands(MemoryUnit **table, char *op_line,
                     unsigned int dest_operand, unsigned int src_operand,
                     int line_number, int *L, int num_of_operands) {
     char *line_args, *line_copy;
-    unsigned int encoding_type;
-    MemoryUnit *new;
     
     /* no operands, no need to encode */
     if (num_of_operands == NO_OPERANDS) {
@@ -236,10 +234,8 @@ int encode_op_sentence(char *op_line,
     LineArg operand_type;
 
     /* word fields -initialize with zeros */
-    unsigned int encoding_type = A;
     unsigned int dest_operand = IMMEDIATE;
     unsigned int src_operand = IMMEDIATE;
-    unsigned int opcode = operations[0].code;
 
     /* words and args counter */
     int L = 0, arg_id = 0;
