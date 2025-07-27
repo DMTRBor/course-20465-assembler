@@ -10,8 +10,8 @@ struct operation {
 
 enum OpNumOfOperands{
     NO_OPERANDS,
-    SINGLE_OPERAND,
-    TWO_OPERANDS
+    DEST_ONLY,
+    SRC_AND_DEST
 };
 
 
@@ -69,6 +69,8 @@ extern ExpectedNumOfOperands expected_num_of_operands[];
 
 
 #define MEMORY_SIZE 256
+#define MIN_INTEGER -128
+#define MAX_INTEGER 127
 
 #define MAX_WORDS_IN_SENTENCE 5
 

@@ -6,16 +6,16 @@ struct operation operations[] = {
     {"cmp", 1},
     {"add", 2},
     {"sub", 3},
-    {"not", 4},
+    {"lea", 4},
     {"clr", 5},
-    {"lea", 6},
+    {"not", 6},
     {"inc", 7},
     {"dec", 8},
     {"jmp", 9},
     {"bne", 10},
-    {"red", 11},
-    {"prn", 12},
-    {"jsr", 13},
+    {"jsr", 11},
+    {"red", 12},
+    {"prn", 13},
     {"rts", 14},
     {"stop", 15}
 };
@@ -52,36 +52,36 @@ LegalAddrMethods legal_addressing_methods[] = {
     { &operations[1],  {1, 1, 1, 1}, {1, 1, 1, 1} },    /* cmp */
     { &operations[2],  {1, 1, 1, 1}, {0, 1, 1, 1} },    /* add */
     { &operations[3],  {1, 1, 1, 1}, {0, 1, 1, 1} },    /* sub */
-    { &operations[4],  {0, 1, 1, 0}, {0, 1, 1, 1} },    /* not */
+    { &operations[4],  {0, 1, 1, 0}, {0, 1, 1, 1} },    /* lea */
     { &operations[5],  {0, 0, 0, 0}, {0, 1, 1, 1} },    /* clr */
-    { &operations[6],  {0, 0, 0, 0}, {0, 1, 1, 1} },    /* lea */
+    { &operations[6],  {0, 0, 0, 0}, {0, 1, 1, 1} },    /* not */
     { &operations[7],  {0, 0, 0, 0}, {0, 1, 1, 1} },    /* inc */
     { &operations[8],  {0, 0, 0, 0}, {0, 1, 1, 1} },    /* dec */
     { &operations[9],  {0, 0, 0, 0}, {0, 1, 1, 1} },    /* jmp */
     { &operations[10], {0, 0, 0, 0}, {0, 1, 1, 1} },    /* bne */
-    { &operations[11], {0, 0, 0, 0}, {0, 1, 1, 1} },    /* red */
-    { &operations[12], {0, 0, 0, 0}, {0, 1, 1, 1} },    /* prn */
-    { &operations[13], {0, 0, 0, 0}, {0, 1, 1, 1} },    /* jsr */
+    { &operations[11], {0, 0, 0, 0}, {0, 1, 1, 1} },    /* jsr */
+    { &operations[12], {0, 0, 0, 0}, {0, 1, 1, 1} },    /* red */
+    { &operations[13], {0, 0, 0, 0}, {1, 1, 1, 1} },    /* prn */
     { &operations[14], {0, 0, 0, 0}, {0, 0, 0, 0} },    /* rts */
     { &operations[15], {0, 0, 0, 0}, {0, 0, 0, 0} }     /* stop */
 };
 
 
 ExpectedNumOfOperands expected_num_of_operands[] = {
-    { &operations[0],  TWO_OPERANDS },     /* mov */
-    { &operations[1],  TWO_OPERANDS },     /* cmp */
-    { &operations[2],  TWO_OPERANDS },     /* add */
-    { &operations[3],  TWO_OPERANDS },     /* sub */
-    { &operations[4],  SINGLE_OPERAND },   /* not */
-    { &operations[5],  SINGLE_OPERAND },   /* clr */
-    { &operations[6],  TWO_OPERANDS },     /* lea */
-    { &operations[7],  SINGLE_OPERAND },   /* inc */
-    { &operations[8],  SINGLE_OPERAND },   /* dec */
-    { &operations[9],  SINGLE_OPERAND },   /* jmp */
-    { &operations[10], SINGLE_OPERAND },   /* bne */
-    { &operations[11], SINGLE_OPERAND },   /* red */
-    { &operations[12], SINGLE_OPERAND },   /* prn */
-    { &operations[13], SINGLE_OPERAND },   /* jsr */
+    { &operations[0],  SRC_AND_DEST },     /* mov */
+    { &operations[1],  SRC_AND_DEST },     /* cmp */
+    { &operations[2],  SRC_AND_DEST },     /* add */
+    { &operations[3],  SRC_AND_DEST },     /* sub */
+    { &operations[4],  SRC_AND_DEST },     /* lea */
+    { &operations[5],  DEST_ONLY },        /* clr */
+    { &operations[6],  DEST_ONLY },        /* not */
+    { &operations[7],  DEST_ONLY },        /* inc */
+    { &operations[8],  DEST_ONLY },        /* dec */
+    { &operations[9],  DEST_ONLY },        /* jmp */
+    { &operations[10], DEST_ONLY },        /* bne */
+    { &operations[11], DEST_ONLY },        /* jsr */
+    { &operations[12], DEST_ONLY },        /* red */
+    { &operations[13], DEST_ONLY },        /* prn */
     { &operations[14], NO_OPERANDS },      /* rts */
     { &operations[15], NO_OPERANDS }       /* stop */
 };

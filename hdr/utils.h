@@ -55,23 +55,20 @@
 /* args and operators indices */
 #define FIRST_ARG_ID 1
 #define SEC_ARG_ID 2
-#define DEST_ONLY 1
-#define SRC_AND_DEST 2
 
 #define IC_DC_RESET_VALUE 0
 
-
+/* status codes */
 enum {
     STATUS_CODE_OK,
     STATUS_CODE_ERR
 };
 
-
+/* general true/false */
 enum {
     FALSE,
     TRUE
 };
-
 
 typedef enum {
     EMPTY_LINE,
@@ -104,8 +101,10 @@ int is_macro_call(char *, char *);
 int is_operation(char *);
 int is_instruction(char *);
 int is_register(char *);
+
 LineArg get_operand_type(char *);
-unsigned int get_operand_code_from_type(LineArg);
+AddrMethodCode get_operand_code_from_type(LineArg);
+
 void set_word_operand_field(LineArg, int, int, unsigned int *, unsigned int *);
 
 #endif

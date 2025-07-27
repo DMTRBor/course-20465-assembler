@@ -47,6 +47,7 @@ void set_word_fields(MemoryUnit *,
                      unsigned int);
 void add_mem_unit_to_table(MemoryUnit **, MemoryUnit *);
 void free_mem_table(MemoryUnit *head);
+void add_unit_and_increment_L(MemoryUnit **, MemoryUnit *, int *);
 
 /* ----------- Labels Table Functions ----------- */
 Label* new_label(void);

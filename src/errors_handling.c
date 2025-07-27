@@ -38,8 +38,7 @@ int is_macro_name_valid(char *line, int line_number) {
 
 
 int is_macro_args_num_valid(char *line, int num_of_expected_args) {
-    char *line_args;
-    char *line_copy;
+    char *line_args, *line_copy;
     int num_of_args = 0;  /* number of args in line */
 
     /* copy line for processing */
@@ -85,8 +84,7 @@ int is_valid_label(char *arg, int line_number) {
 
 
 int is_operands_num_valid(char *line, int num_of_operands) {
-    char *line_args;
-    char *line_copy;
+    char *line_args, *line_copy;
     char *operation_name;
     int id;
 
@@ -110,32 +108,111 @@ int is_operands_num_valid(char *line, int num_of_operands) {
 }
 
 
-int is_operands_legal(char *line, int num_of_operands) {
-    char *line_args;
-    char *line_copy;
-    char *operation_name;
-    int id;
-
-    /* copy line for processing */
-    line_copy = strdup(line);
-    /* get first token (operation name) */
-    operation_name = strtok(line_copy, WHITESPACE);
-
-    /* TODO */
-    free(line_copy);
+int is_operand_value_legal(char *operand, int line_number) {
+    char *end;
+    long value;
+    
+    /* convert string to integer */
+    value = strtol(operand, &end, BASE_10);
+    
+    /* check if conversion was successful (no remaining characters) */
+    if (*end != NULL_TERMINATOR) {
+        fprintf(stderr, "Error in line %d: invalid operand value '%s'. Must be an integer\n", 
+                line_number, operand);
+        return FALSE;
+    }
+    
+    /* check if value is within allowed range */
+    if (value < MIN_INTEGER || value > MAX_INTEGER) {
+        fprintf(stderr, "Error in line %d: operand value '%s' out of range. Must be between %d and %d\n",
+                line_number, operand, MIN_INTEGER, MAX_INTEGER);
+        return FALSE;
+    }
+    
     return TRUE;
+}
 
-    /* operation not found */
-    free(line_copy);
-    return FALSE;
+
+int is_src_addr_method_valid(char *op_name, unsigned int src_operand, int op_id) {
+    switch (src_operand) {
+        case IMMEDIATE:
+            if (!legal_addressing_methods[op_id].legal_src_addr_method.immediate_addressing)
+                return FALSE;
+            break;
+        case DIRECT:
+            if (!legal_addressing_methods[op_id].legal_src_addr_method.direct_addressing)
+                return FALSE;
+            break;
+        case MAT:
+            if (!legal_addressing_methods[op_id].legal_src_addr_method.mat_addressing)
+                return FALSE;
+            break;
+        case REG:
+            if (!legal_addressing_methods[op_id].legal_src_addr_method.reg_addressing)
+                return FALSE;
+            break;
+    }
+
+    return TRUE;  /* valid addressing method */
+}
+
+
+int is_dest_addr_method_valid(char *op_name, unsigned int dest_operand, int op_id) {
+    switch (dest_operand) {
+        case IMMEDIATE:
+            if (!legal_addressing_methods[op_id].legal_dst_addr_method.immediate_addressing)
+                return FALSE;
+            break;
+        case DIRECT:
+            if (!legal_addressing_methods[op_id].legal_dst_addr_method.direct_addressing)
+                return FALSE;
+            break;
+        case MAT:
+            if (!legal_addressing_methods[op_id].legal_dst_addr_method.mat_addressing)
+                return FALSE;
+            break;
+        case REG:
+            if (!legal_addressing_methods[op_id].legal_dst_addr_method.reg_addressing)
+                return FALSE;
+            break;
+    }
+
+    return TRUE;  /* valid addressing method */
+}
+
+
+int is_legal_addressing_methods(char *op_name, unsigned int dest_operand,
+                                unsigned int src_operand, int num_of_operands) {
+    int id;  /* array index */
+    
+    /* search for operation in legal_addressing_methods array */
+    for (id = 0; id < NUM_OF_OPERATIONS; id++) {
+        /* find operation*/
+        if (strcmp(op_name, legal_addressing_methods[id].oper->name) == STR_EQUAL) {
+            /* check source and destination operand addressing methods */
+            if (num_of_operands == DEST_ONLY) {
+                if (!is_dest_addr_method_valid(op_name, dest_operand, id))
+                    return FALSE;  /* illegal destination addressing method found */
+            }
+            else if (num_of_operands == SRC_AND_DEST) {
+                if (!is_src_addr_method_valid(op_name, src_operand, id) ||
+                    !is_dest_addr_method_valid(op_name, dest_operand, id)) {
+                    return FALSE;  /* illegal addressing method found */
+                }
+            }
+
+            return TRUE;  /* no operands || all addressing methods are legal */
+        }
+    }
+
+    return FALSE;  /* operation name not found (though already checked) */
 }
 
 
 /* ---------------------------------------------------------------------- */
 
 LineArg detect_and_validate_first_arg(char *line, int line_number) {
-    char *line_args;
-    char *line_copy;
+    char *line_args, *line_copy;
     LineArg line_arg_type = ERROR;
 
     /* copy line for processing */
@@ -165,8 +242,7 @@ LineArg detect_and_validate_first_arg(char *line, int line_number) {
 
 
 int get_num_of_operands(char *line, int line_number) {
-    char *line_args;
-    char *line_copy;
+    char *line_args, *line_copy;
     int num_of_args = 0;
 
     /* copy line for processing */
@@ -192,116 +268,4 @@ int get_num_of_operands(char *line, int line_number) {
 
     free(line_copy);
     return num_of_args;
-}
-
-
-/* --------------------------------- Encoding --------------------------------- */
-
-int encode_operation(MemoryUnit **table,
-                     char *op_name,
-                     unsigned int dest_operand,
-                     unsigned int src_operand,
-                     int line_number) {
-    int id;  /* array index */
-    unsigned int encoding_type, opcode;
-    MemoryUnit *new;
-
-    /* search for operation in operations table */
-    for (id = 0; id < NUM_OF_OPERATIONS; id++) {
-        if (strcmp(op_name, operations[id].name) == STR_EQUAL) {
-            /* allocate new memory unit */
-            new = new_mem_unit();
-
-            if (new == NULL) {
-                fprintf(stderr, "Memory allocation error in line %d\n", line_number);
-                return STATUS_CODE_ERR;  /* memory allocation failed */
-            }
-
-            /* found operation, encode it */
-            encoding_type = A;
-            opcode = operations[id].code;
-            /* set fields in memory unit */
-            set_word_fields(new,
-                            encoding_type,
-                            dest_operand,
-                            src_operand,
-                            opcode);
-            /* add to table */
-            add_mem_unit_to_table(table, new);
-            
-            return STATUS_CODE_OK;
-        }
-    }
-
-    fprintf(stderr, "Error in line %d: unknown operation '%s'\n", line_number, op_name);
-    return STATUS_CODE_ERR;  /* unknown operation */
-}
-
-
-int encode_op_sentence(char *op_line,
-                       int num_of_operands,
-                       MemoryUnit **table,
-                       int line_number) {
-    char *line_args, *line_copy, *op_name;
-    LineArg operand_type;
-
-    /* word fields -initialize with zeros */
-    unsigned int encoding_type = A;
-    unsigned int dest_operand = IMMEDIATE;
-    unsigned int src_operand = IMMEDIATE;
-    unsigned int opcode = operations[0].code;
-
-    /* words and args counter */
-    int L = 0, arg_id = 0;
-
-    /* copy line for processing */
-    line_copy = strdup(op_line);
-    /* tokenize with different delimiters */
-    line_args = strtok(line_copy, OP_DELIMITERS);
-    
-    /* extract info for operation encoding */
-    while (line_args != NULL) {
-        if (arg_id == FIRST_ARG)  /* get operation name */
-            op_name = strdup(line_args);
-        else {
-            if ((operand_type = get_operand_type(line_args)) == ERROR) {
-                fprintf(stderr, "Error in line %d: invalid operand type - %s\n", line_number, line_args);
-                free(line_copy);
-                free(op_name);
-                return WORDS_NUM_ERROR;  /* invalid operand type */
-            }
-
-            /* set operand field based on type */
-            set_word_operand_field(operand_type, arg_id, num_of_operands,
-                                   &dest_operand, &src_operand);
-        }
-
-        /* get next token/arg */
-        line_args = strtok(NULL, OP_DELIMITERS);
-        arg_id++;
-    }
-
-    /* encode operation */
-    if (encode_operation(table, op_name, dest_operand, src_operand, line_number) == STATUS_CODE_ERR) {
-        free(line_copy);
-        free(op_name);
-        return WORDS_NUM_ERROR;  /* encoding failed */
-    }
-    /* count encoded operation */
-    L++;
-
-    /* encode operands */
-
-
-    /* check if number of words is not exceeded */
-    if (L > MAX_WORDS_IN_SENTENCE) {
-        fprintf(stderr, "Error in line %d: too many words in sentence\n", line_number);
-        free(line_copy);
-        free(op_name);
-        return WORDS_NUM_ERROR;
-    }
-
-    free(line_copy);
-    free(op_name);
-    return L;
 }

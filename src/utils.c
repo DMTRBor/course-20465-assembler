@@ -84,8 +84,7 @@ FILE* open_file(char *filename, char *permission) {
  * This function receives a line
  */
 LineArg detect_arg_type(char *line) {
-    char *line_args;
-    char *line_copy;
+    char *line_args, *line_copy;
     LineArg line_arg_type = ERROR;
 
     /* copy line for processing */
@@ -143,8 +142,7 @@ char* get_macro_name(char *line) {
 
 
 int is_macro_call(char *line, char *macro_name) {
-    char *line_args;
-    char *line_copy;
+    char *line_args, *line_copy;
 
     /* copy line for processing */
     line_copy = strdup(line);
@@ -241,7 +239,7 @@ LineArg get_operand_type(char *operand) {
 }
 
 
-unsigned int get_operand_code_from_type(LineArg operand_type) {
+AddrMethodCode get_operand_code_from_type(LineArg operand_type) {
     if (operand_type == IMMEDIATE_ADDR)
         return IMMEDIATE;
     else if (operand_type == DIRECT_ADDR)

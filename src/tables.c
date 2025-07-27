@@ -81,6 +81,12 @@ void free_mem_table(MemoryUnit *head) {
 }
 
 
+void add_unit_and_increment_L(MemoryUnit **table, MemoryUnit *new, int *L) {
+    add_mem_unit_to_table(table, new);
+    (*L)++;
+}
+
+
 /* ---------------------------- Labels Table ---------------------------- */
 
 Label* new_label(void) {

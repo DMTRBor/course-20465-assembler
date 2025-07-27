@@ -91,11 +91,7 @@ int run_first_pass(char *filename, int *IC, int *DC, MemoryUnit **mem, Label **l
                     error_flag = TRUE;
                     break;
                 }
-                /* check if operands are legal for this operation */
-                if (!is_operands_legal(curr_line->line, L)) {
-                    error_flag = TRUE;
-                    break;
-                }
+
                 /* encode operation and operands */
                 if ((L = encode_op_sentence(curr_line->line, num_of_operands,
                                             mem, line_number)) == WORDS_NUM_ERROR) {
