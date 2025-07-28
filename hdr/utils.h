@@ -24,8 +24,8 @@
 /* delimiters and hallmarks */
 #define MACRO_START "mcro"
 #define MACRO_END "mcroend"
-#define LABEL_SIGN ":"
-#define INSTRUCTION_SIGN "."
+#define LABEL_END_SIGN ':'
+#define DIRECTIVE_SIGN "."
 #define IMMEDIATE_ADDR_SIGN '#'
 #define REGISTER_PREFIX "r"
 #define MAT_LEFT_BRACE '['
@@ -76,8 +76,8 @@ typedef enum {
     MCRO,
     MCROEND,
     LABEL,
-    OPERATION,
     INSTRUCTION,
+    DIRECTIVE,
     IMMEDIATE_ADDR,
     DIRECT_ADDR,
     REGISTER_ADDR,
@@ -99,7 +99,7 @@ int is_macro_call(char *, char *);
 
 /* First/Second Pass */
 int is_operation(char *);
-int is_instruction(char *);
+int is_directive(char *);
 int is_register(char *);
 
 LineArg get_operand_type(char *);

@@ -3,8 +3,7 @@
 
 int run_first_pass(char *filename, int *IC, int *DC, MemoryUnit **mem, Label **labels) {
     int line_number = 1;
-    int mem_units_cnt = 0;  /* memory units count */
-    int num_of_operands = 0;  /* number of operands in operation */
+    int num_of_operands = 0;  /* number of operands for operation */
     /* number of words occupied by the operation and the operands */
     int L = 0;
 
@@ -18,7 +17,7 @@ int run_first_pass(char *filename, int *IC, int *DC, MemoryUnit **mem, Label **l
     FILE *fp;
 
     Line *curr_line = NULL;  /* lines list */
-    Label *curr_label = NULL;  /* current label */
+    Label *label = NULL;
     /* save pointer to first memory unit */
     MemoryUnit **first_mem_unit = mem;
 
@@ -44,7 +43,8 @@ int run_first_pass(char *filename, int *IC, int *DC, MemoryUnit **mem, Label **l
         line_arg_type = detect_and_validate_first_arg(curr_line->line, line_number);
         line_number++;
 
-        if (mem_units_cnt > MEMORY_SIZE) {
+        /* check if memory exceeded */
+        if ((*IC + *DC) > MEMORY_SIZE) {
             fprintf(stderr, "Error in line %d: memory size exceeded\n", line_number);
             error_flag = TRUE;
             break;
@@ -61,7 +61,7 @@ int run_first_pass(char *filename, int *IC, int *DC, MemoryUnit **mem, Label **l
 
                 break;
 
-            case INSTRUCTION:
+            case DIRECTIVE:
                 /* .entry will be completed in second pass */
                 // if (is_extern()) {
                     /* add label after .extern to labels table */
@@ -69,22 +69,31 @@ int run_first_pass(char *filename, int *IC, int *DC, MemoryUnit **mem, Label **l
                 // }
                 break;
 
-            case OPERATION:
-                // if (is_label) {
-                    // /* add label to labels table */
-                    // curr_label = init_label(curr_line->line, CODE, *ic);
-                    // if (curr_label == NULL) {
-                    //     fprintf(stderr, "Memory allocation error in line %d\n", line_number);
-                    //     error_flag = TRUE;
-                    //     break;
-                    // }
-                    // /* check if label already exists */
-                    // if (add_label_to_table(labels, curr_label, *ic) == STATUS_CODE_ERR) {
-                    //     fprintf(stderr, "Label '%s' already exists in line %d\n", curr_label->name, line_number);
+            case INSTRUCTION:
+                if (is_label) {
+                    /* create new label */
+                    label = new_label();
+
+                    if (label == NULL) {
+                        fprintf(stderr, "Memory allocation error in line %d\n", line_number);
+                        error_flag = TRUE;
+                        break;
+                    }
+
+                    /* check if label already exists */
+                    // if (add_label_to_table(labels, label) == STATUS_CODE_ERR) {
+                    //     fprintf(stderr, "Label '%s' already exists in line %d\n", label->name, line_number);
                     //     free(curr_label);
                     //     error_flag = TRUE;
                     // }
-                // }
+
+                    /* new label detected - add to table */
+                    if (add_label_to_table(labels, label) == STATUS_CODE_ERR) {
+                        fprintf(stderr, "Failed to add label '%s' to list at line %d\n", label->name, line_number);
+                        free(label);
+                        error_flag = TRUE;
+                    }
+                }
 
                 /* validate operands number */
                 if ((num_of_operands = get_num_of_operands(curr_line->line, line_number)) == OPERANDS_NUM_ERROR) {
@@ -93,14 +102,13 @@ int run_first_pass(char *filename, int *IC, int *DC, MemoryUnit **mem, Label **l
                 }
 
                 /* encode operation and operands */
-                if ((L = encode_op_sentence(curr_line->line, num_of_operands,
+                if ((L = encode_instruction(curr_line->line, num_of_operands,
                                             mem, line_number)) == WORDS_NUM_ERROR) {
                     error_flag = TRUE;
                     break;
                 }
                 
                 *IC += L;  /* update instruction counter */
-                mem_units_cnt += L;  /* update memory units count */
                 break;
 
             default:

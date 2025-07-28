@@ -15,11 +15,10 @@ int is_macro_name_valid(char *line, int line_number) {
         }
     }
 
-    /* check if instruction appears in macro name */
-    for (id = 0; id < NUM_OF_INSTRUCTIONS; id++) {
-        if (strstr(line, instructions[id]) != NULL) {
+    for (id = 0; id < NUM_OF_DIRECTIVES; id++) {
+        if (strstr(line, directives[id]) != NULL) {
             fprintf(stderr,
-                "Illegal argument in line %d: instruction '%s' found in line\n", line_number, instructions[id]);
+                "Illegal argument in line %d: directive '%s' found in line\n", line_number, directives[id]);
             return FALSE;
         }
     }
@@ -72,7 +71,7 @@ int is_valid_label(char *arg, int line_number) {
 
     /* check if label contains only valid characters */
     for (id = 0; arg[id] != NULL_TERMINATOR; id++) {
-        if (!isalnum(arg[id]) && arg[id] != UNDERSCORE) {
+        if (!isalnum(arg[id]) && arg[id] != UNDERSCORE && arg[id] != LABEL_END_SIGN) {
             fprintf(stderr,
                 "Invalid label in line %d: '%s' contains invalid character '%c'\n", line_number, arg, arg[id]);
             return FALSE;
@@ -227,10 +226,10 @@ LineArg detect_and_validate_first_arg(char *line, int line_number) {
         line_arg_type = COMMENT;
     }
     else if (is_operation(line_args)) {
-        line_arg_type = OPERATION;
-    }
-    else if (is_instruction(line_args)) {
         line_arg_type = INSTRUCTION;
+    }
+    else if (is_directive(line_args)) {
+        line_arg_type = DIRECTIVE;
     }
     else if (is_valid_label(line_args, line_number)) {
         line_arg_type = LABEL;

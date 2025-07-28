@@ -276,7 +276,7 @@ int encode_operands(MemoryUnit **table, char *op_line,
 }
 
 
-int encode_op_sentence(char *op_line,
+int encode_instruction(char *op_line,
                        int num_of_operands,
                        MemoryUnit **table,
                        int line_number) {

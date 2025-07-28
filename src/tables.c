@@ -134,16 +134,24 @@ void free_labels_table(Label *head) {
 }
 
 
-void add_label_to_table(Label **tail, Label *new_label) {
-    if (tail == NULL || new_label == NULL)
-        return;
+int add_label_to_table(Label **head, Label *new_label) {
+    Label *current;
     
-    if (*tail == NULL)
-        *tail = new_label;
+    if (head == NULL || new_label == NULL)
+        return STATUS_CODE_ERR;
+
+    if (*head == NULL)
+        *head = new_label;
     else {
-        (*tail)->next = new_label;
-        *tail = new_label;
+        current = *head;
+
+        while (current->next != NULL)
+            current = current->next;
+
+        current->next = new_label;
     }
+
+    return STATUS_CODE_OK;
 }
 
 

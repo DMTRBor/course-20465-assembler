@@ -26,6 +26,6 @@ int encode_both_registers(MemoryUnit **, char *, int, int *);
 int encode_operation(MemoryUnit **, char *, unsigned int, unsigned int, int, int *);
 int encode_operand_by_type(char *, int, unsigned int, int, int *, MemoryUnit **);
 int encode_operands(MemoryUnit **, char *, unsigned int, unsigned int, int, int *, int);
-int encode_op_sentence(char *, int, MemoryUnit **, int);
+int encode_instruction(char *, int, MemoryUnit **, int);
 
 #endif

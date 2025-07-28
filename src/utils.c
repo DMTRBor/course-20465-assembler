@@ -181,17 +181,17 @@ int is_operation(char *arg) {
 }
 
 
-int is_instruction(char *arg) {
+int is_directive(char *arg) {
     int id;  /* array index */
 
-    /* check if argument is an instruction */
-    for (id = 0; id < NUM_OF_INSTRUCTIONS; id++) {
-        if (strcmp(arg, instructions[id]) == STR_EQUAL) {
+    /* check if argument is a directive */
+    for (id = 0; id < NUM_OF_DIRECTIVES; id++) {
+        if (strcmp(arg, directives[id]) == STR_EQUAL) {
             return TRUE;
         }
     }
 
-    return FALSE;  /* not an instruction */
+    return FALSE;  /* not a directive */
 }
 
 

@@ -62,7 +62,7 @@ typedef struct {
 
 /* external declarations */
 extern struct operation operations[];
-extern const char *instructions[];
+extern const char *directives[];
 extern const char *registers[];
 extern LegalAddrMethods legal_addressing_methods[];
 extern ExpectedNumOfOperands expected_num_of_operands[];
@@ -75,7 +75,7 @@ extern ExpectedNumOfOperands expected_num_of_operands[];
 #define MAX_WORDS_IN_SENTENCE 5
 
 #define NUM_OF_OPERATIONS 16
-#define NUM_OF_INSTRUCTIONS 5
+#define NUM_OF_DIRECTIVES 5
 
 #define NUM_OF_REGISTERS 8
 

@@ -21,7 +21,7 @@ struct operation operations[] = {
 };
 
 
-const char *instructions[NUM_OF_INSTRUCTIONS] = {
+const char *directives[NUM_OF_DIRECTIVES] = {
     ".data",
     ".string",
     ".mat",
