@@ -21,6 +21,7 @@ void encode_operand_8_bit(Word *, int);
 void encode_operand_first_index(Word *, unsigned int);
 void encode_operand_sec_index(Word *, unsigned int);
 int encode_matrix_row_col(Word *, char *, int);
+int encode_both_registers(MemoryUnit **, char *, int, int *);
 
 int encode_operation(MemoryUnit **, char *, unsigned int, unsigned int, int, int *);
 int encode_operand_by_type(char *, int, unsigned int, int, int *, MemoryUnit **);

@@ -36,7 +36,7 @@ int encode_matrix_row_col(Word *word, char *operand, int line_number) {
         if (arg_id > FIRST_ARG) {  /* skip matrix name */
             /* validate register row/col index */
             if (!is_register(op_args)) {
-                fprintf(stderr, "Error in line %d: invalid matrix operand '%s'\n", line_number, op_args);
+                fprintf(stderr, "Error in line %d: invalid matrix index '%s'\n", line_number, op_args);
                 free(op_copy);
                 return STATUS_CODE_ERR;  /* invalid row/col */
             }
@@ -63,6 +63,42 @@ int encode_matrix_row_col(Word *word, char *operand, int line_number) {
 
     free(op_copy);
     return STATUS_CODE_OK;
+}
+
+
+int encode_both_registers(MemoryUnit **table, char *line_args, int line_number, int *L) {
+    MemoryUnit *new;
+
+    /* validate first register */
+    if (!is_register(line_args)) {
+        fprintf(stderr, "Error in line %d: invalid register number '%s'\n", line_number, line_args);
+        return STATUS_CODE_ERR;  /* invalid register */
+    }
+
+    /* allocate new memory unit */
+    if ((new = new_mem_unit()) == NULL) {
+        fprintf(stderr, "Memory allocation error in line %d, operand %s\n", line_number, line_args);
+        return STATUS_CODE_ERR;  /* memory allocation failed */
+    }
+
+    new->encoded_value.encoding_type = A;
+    encode_operand_first_index(&new->encoded_value,
+                                (unsigned int)strtoul(line_args + 1, NULL, BASE_10));
+
+    /* get next operand */
+    line_args = strtok(NULL, OP_DELIMITERS);
+    /* validate second register */
+    if (!is_register(line_args)) {
+        fprintf(stderr, "Error in line %d: invalid register number '%s'\n", line_number, line_args);
+        return STATUS_CODE_ERR;  /* invalid register */
+    }
+    
+    encode_operand_sec_index(&new->encoded_value,
+                            (unsigned int)strtoul(line_args + 1, NULL, BASE_10));
+    /* add new memory unit to table, increment words counter */
+    add_unit_and_increment_L(table, new, L);
+
+    return STATUS_CODE_OK;  /* encoding succeeded */
 }
 
 
@@ -110,7 +146,7 @@ int encode_operation(MemoryUnit **table,
 
 int encode_operand_by_type(char *operand, int is_src, unsigned int operand_type,
                            int line_number, int *L, MemoryUnit **table) {
-    MemoryUnit *new;       /* for first word */
+    MemoryUnit *new;   /* for first word */
     MemoryUnit *new1;  /* for second word */
 
     /* allocate new memory unit */
@@ -156,6 +192,11 @@ int encode_operand_by_type(char *operand, int is_src, unsigned int operand_type,
             add_unit_and_increment_L(table, new1, L);
             break;
         case REG:
+            if (!is_register(operand)) {
+                fprintf(stderr, "Error in line %d: invalid register number '%s'\n", line_number, operand);
+                return STATUS_CODE_ERR;  /* invalid register */
+            }
+
             new->encoded_value.encoding_type = A;
             if (is_src) {  /* source operand is a register */
                 encode_operand_first_index(&new->encoded_value,
@@ -200,17 +241,26 @@ int encode_operands(MemoryUnit **table, char *op_line,
     
     /* source and destination */
     if (num_of_operands == SRC_AND_DEST) {
-        /* encode source operand */
-        if (encode_operand_by_type(line_args, TRUE, src_operand, line_number, L, table) == STATUS_CODE_ERR) {
-            free(line_copy);
-            return STATUS_CODE_ERR;  /* encoding failed */
+        if (src_operand == REG && dest_operand == REG) {  /* both operands are registers */
+            if (encode_both_registers(table, line_args, line_number, L) == STATUS_CODE_ERR) {
+                free(line_copy);
+                return STATUS_CODE_ERR;
+            }
         }
-        /* get next operand */
-        line_args = strtok(NULL, OP_DELIMITERS);
-        /* encode destination operand */
-        if (encode_operand_by_type(line_args, FALSE, dest_operand, line_number, L, table) == STATUS_CODE_ERR) {
-            free(line_copy);
-            return STATUS_CODE_ERR;  /* encoding failed */
+        /* operands are not both registers */
+        else {
+            /* encode source operand */
+            if (encode_operand_by_type(line_args, TRUE, src_operand, line_number, L, table) == STATUS_CODE_ERR) {
+                free(line_copy);
+                return STATUS_CODE_ERR;  /* encoding failed */
+            }
+            /* get next operand */
+            line_args = strtok(NULL, OP_DELIMITERS);
+            /* encode destination operand */
+            if (encode_operand_by_type(line_args, FALSE, dest_operand, line_number, L, table) == STATUS_CODE_ERR) {
+                free(line_copy);
+                return STATUS_CODE_ERR;  /* encoding failed */
+            }
         }
     }
     /* destination only */
