@@ -54,6 +54,6 @@ Label* new_label(void);
 void set_label_fields(Label *, int, char *, unsigned int);
 void free_labels_table(Label *);
 int add_label_to_table(Label **, Label *);
-int is_label_exist(Label *, Label *);
+int is_label_exists(Label **, Label *);
 
 #endif

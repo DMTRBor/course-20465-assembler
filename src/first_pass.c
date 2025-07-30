@@ -6,20 +6,17 @@ int run_first_pass(char *filename, int *IC, int *DC, MemoryUnit **mem, Label **l
     int num_of_operands = 0;  /* number of operands for operation */
     /* number of words occupied by the operation and the operands */
     int L = 0;
+    int is_label = FALSE;  /* label flag */
 
     /* use error cheking for content of .am file */
     int error_flag = FALSE;
     LineArg line_arg_type = ERROR;
-
-    int is_label = FALSE;  /* label flag */
 
     char am_filename[MAX_FNAME_LEN];
     FILE *fp;
 
     Line *curr_line = NULL;  /* lines list */
     Label *label = NULL;
-    /* save pointer to first memory unit */
-    MemoryUnit **first_mem_unit = mem;
 
     /* add macro-parsed file extension */
     strcpy(am_filename, filename);
@@ -31,9 +28,7 @@ int run_first_pass(char *filename, int *IC, int *DC, MemoryUnit **mem, Label **l
 
     /* create file lines structured list */
     /* point to first line */
-    curr_line = file_to_list(fp);
-
-    if (curr_line == NULL) {  /* memory misallocation */
+    if ((curr_line = file_to_list(fp)) == NULL) {  /* memory misallocation */
         fclose(fp);
         return STATUS_CODE_ERR;
     }
@@ -41,7 +36,6 @@ int run_first_pass(char *filename, int *IC, int *DC, MemoryUnit **mem, Label **l
 
     while (curr_line != NULL) {
         line_arg_type = detect_and_validate_first_arg(curr_line->line, line_number);
-        line_number++;
 
         /* check if memory exceeded */
         if ((*IC + *DC) > MEMORY_SIZE) {
@@ -56,10 +50,33 @@ int run_first_pass(char *filename, int *IC, int *DC, MemoryUnit **mem, Label **l
                 break;  /* ignore these lines */
 
             case LABEL:
-                // is_label = TRUE;
                 /* add to labels table */
+                if ((label = new_label()) == NULL) {  /* create new label */
+                    fprintf(stderr, "Memory allocation error in line %d\n", line_number);
+                    error_flag = TRUE;
+                    break;
+                }
+                /* fill label fields */
+                set_label_fields(label, line_number,
+                                 get_label_name(&curr_line->line), *IC);
 
-                break;
+                /* check if label already exists */
+                if (is_label_exists(labels, label)) {
+                    fprintf(stderr, "Label '%s' from line %d already exists\n", label->name, line_number);
+                    free(label);
+                    error_flag = TRUE;
+                }
+
+                /* new label detected - add to table */
+                if (add_label_to_table(labels, label) == STATUS_CODE_ERR) {
+                    fprintf(stderr, "Failed to add label '%s' to list at line %d\n", label->name, line_number);
+                    free(label);
+                    error_flag = TRUE;
+                }
+
+                is_label = TRUE;
+                label = label->next;  /* point to next label */
+                continue;             /* process the remaining content in the line */
 
             case DIRECTIVE:
                 /* .entry will be completed in second pass */
@@ -70,31 +87,6 @@ int run_first_pass(char *filename, int *IC, int *DC, MemoryUnit **mem, Label **l
                 break;
 
             case INSTRUCTION:
-                if (is_label) {
-                    /* create new label */
-                    label = new_label();
-
-                    if (label == NULL) {
-                        fprintf(stderr, "Memory allocation error in line %d\n", line_number);
-                        error_flag = TRUE;
-                        break;
-                    }
-
-                    /* check if label already exists */
-                    // if (add_label_to_table(labels, label) == STATUS_CODE_ERR) {
-                    //     fprintf(stderr, "Label '%s' already exists in line %d\n", label->name, line_number);
-                    //     free(curr_label);
-                    //     error_flag = TRUE;
-                    // }
-
-                    /* new label detected - add to table */
-                    if (add_label_to_table(labels, label) == STATUS_CODE_ERR) {
-                        fprintf(stderr, "Failed to add label '%s' to list at line %d\n", label->name, line_number);
-                        free(label);
-                        error_flag = TRUE;
-                    }
-                }
-
                 /* validate operands number */
                 if ((num_of_operands = get_num_of_operands(curr_line->line, line_number)) == OPERANDS_NUM_ERROR) {
                     error_flag = TRUE;
@@ -118,6 +110,7 @@ int run_first_pass(char *filename, int *IC, int *DC, MemoryUnit **mem, Label **l
 
         /* go to next line */
         curr_line = curr_line->next;
+        line_number++;
     }
 
     /* errors found in file */

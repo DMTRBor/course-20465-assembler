@@ -155,12 +155,13 @@ int add_label_to_table(Label **head, Label *new_label) {
 }
 
 
-int is_label_exist(Label *label, Label *head) {
-    Label *current = head;
+int is_label_exists(Label **head, Label *label) {
+    Label *current;
     
-    if (head == NULL || label == NULL)
+    if (head == NULL || *head == NULL || label == NULL)
         return FALSE;
     
+    current = *head;
     /* search in labels table */
     while (current != NULL) {
         if (current->type == label->type &&

@@ -10,7 +10,7 @@
  */
 void decimal_to_base4(char *decimal, char *converted) {
     /* temporary converted number storage */
-    char temp[sizeof(converted) / sizeof(char)];
+    char temp[MAX_DIGITS_BASE_4 + 1];  /* +1 for null terminator */
     int decimal_num = 0;
     int power = 2;  /* hundreds */
     int i = 0, j;
@@ -248,6 +248,8 @@ AddrMethodCode get_operand_code_from_type(LineArg operand_type) {
         return MAT;
     else if (operand_type == REGISTER_ADDR)
         return REG;
+    
+    return IMMEDIATE;  /* default operand code */
 }
 
 
@@ -264,4 +266,30 @@ void set_word_operand_field(LineArg operand_type,
         else if (arg_id == SEC_ARG_ID)
             *dest_operand = get_operand_code_from_type(operand_type);
     }
+}
+
+
+char* get_label_name(char **line_with_label) {
+    /* find label end sign */
+    char *lbl_end = strchr(*line_with_label, LABEL_END_SIGN);
+    char *label_name;
+    size_t len;
+
+    /* get label length */
+    len = lbl_end - *line_with_label;
+    if ((label_name = (char *)malloc(len)) == NULL)
+        return NULL; /* allocation failed */
+
+    strncpy(label_name, *line_with_label, len);
+    label_name[len] = NULL_TERMINATOR;
+
+    /* set pointer after label end sign, skip whitespaces */
+    lbl_end++;
+    while (*lbl_end && isspace((unsigned char)*lbl_end)) {
+        lbl_end++;
+    }
+
+    /* point to what goes after the label */
+    *line_with_label = lbl_end;
+    return label_name;
 }

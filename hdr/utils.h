@@ -58,6 +58,9 @@
 
 #define IC_DC_RESET_VALUE 0
 
+/* max for 255 max value */
+#define MAX_DIGITS_BASE_4 5
+
 /* status codes */
 enum {
     STATUS_CODE_OK,
@@ -106,5 +109,7 @@ LineArg get_operand_type(char *);
 AddrMethodCode get_operand_code_from_type(LineArg);
 
 void set_word_operand_field(LineArg, int, int, unsigned int *, unsigned int *);
+
+char* get_label_name(char **);
 
 #endif
