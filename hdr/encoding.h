@@ -17,15 +17,22 @@
 #define UINT_BITS_TO_OPCODE(val)    (((val) >> 4)  & 0xF)
 #define UINT_TO_UPPER_4_BITS(val)    ((val)        & 0xF)
 
+int get_num_of_operands(char *, int);
 void encode_operand_8_bit(Word *, int);
 void encode_operand_first_index(Word *, unsigned int);
 void encode_operand_sec_index(Word *, unsigned int);
 int encode_matrix_row_col(Word *, char *, int);
 int encode_both_registers(MemoryUnit **, char *, int, int *);
 
-int encode_operation(MemoryUnit **, char *, unsigned int, unsigned int, int, int *);
+/* Code */
+int encode_op_name(MemoryUnit **, char *, unsigned int, unsigned int, int, int *);
 int encode_operand_by_type(char *, int, unsigned int, int, int *, MemoryUnit **);
 int encode_operands(MemoryUnit **, char *, unsigned int, unsigned int, int, int *, int);
 int encode_instruction(char *, int, MemoryUnit **, int);
+
+/* Data */
+int encode_data_direc(char *, MemoryUnit **, int);
+int encode_string_direc(char *, MemoryUnit **, int);
+int encode_mat_direc(char *, MemoryUnit **, int);
 
 #endif

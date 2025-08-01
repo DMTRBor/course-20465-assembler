@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     int arg_id = 0;
     FILE *fp;
 
-    int ic_value, dc_value;
+    unsigned int ic_value, dc_value;
 
     /* not enough arguments */
     if (argc < MIN_ALLOWED_ARGS) {

@@ -25,6 +25,5 @@ int is_dest_addr_method_valid(unsigned int, int);
 int is_legal_addressing_methods(char *, unsigned int, unsigned int, int);
 
 LineArg detect_and_validate_first_arg(char *, int);
-int get_num_of_operands(char *, int);
 
 #endif

@@ -61,6 +61,14 @@
 /* max for 255 max value */
 #define MAX_DIGITS_BASE_4 5
 
+/* directives */
+#define DATA_DIRECTIVE ".data"
+#define STRING_DIRECTIVE ".string"
+#define MAT_DIRECTIVE ".mat"
+#define ENTRY_DIRECTIVE ".entry"
+#define EXTERNAL_DIRECTIVE ".extern"
+
+
 /* status codes */
 enum {
     STATUS_CODE_OK,
@@ -104,6 +112,7 @@ int is_macro_call(char *, char *);
 int is_operation(char *);
 int is_directive(char *);
 int is_register(char *);
+int is_expected_directive(char *, char *);
 
 LineArg get_operand_type(char *);
 AddrMethodCode get_operand_code_from_type(LineArg);

@@ -1,11 +1,13 @@
 #include "../hdr/first_pass.h"
 
 
-int run_first_pass(char *filename, int *IC, int *DC, MemoryUnit **mem, Label **labels) {
+int run_first_pass(char *filename, unsigned int *IC, unsigned int *DC,
+                   MemoryUnit **mem, Label **labels) {
     int line_number = 1;
     int num_of_operands = 0;  /* number of operands for operation */
     /* number of words occupied by the operation and the operands */
     int L = 0;
+
     int is_label = FALSE;  /* label flag */
 
     /* use error cheking for content of .am file */
@@ -56,9 +58,9 @@ int run_first_pass(char *filename, int *IC, int *DC, MemoryUnit **mem, Label **l
                     error_flag = TRUE;
                     break;
                 }
-                /* fill label fields */
-                set_label_fields(label, line_number,
-                                 get_label_name(&curr_line->line), *IC);
+                
+                /* set label name */
+                label->name = get_label_name(&curr_line->line);
 
                 /* check if label already exists */
                 if (is_label_exists(labels, label)) {
@@ -75,18 +77,54 @@ int run_first_pass(char *filename, int *IC, int *DC, MemoryUnit **mem, Label **l
                 }
 
                 is_label = TRUE;
-                label = label->next;  /* point to next label */
                 continue;             /* process the remaining content in the line */
 
             case DIRECTIVE:
-                /* .entry will be completed in second pass */
-                // if (is_extern()) {
-                    /* add label after .extern to labels table */
-                    /* set type of label as external and value as 0 */
-                // }
+                if (is_label) {  /* fill label fields, if there is one */
+                    set_label_fields(label, DATA, *DC);
+                }
+                is_label = FALSE;  /* reset label flag */
+
+                /* .entry/.extern will be completed in second pass */
+                if (is_expected_directive(curr_line->line, ENTRY_DIRECTIVE) ||
+                    is_expected_directive(curr_line->line, EXTERNAL_DIRECTIVE)) {
+                    break;
+                }
+                else if (is_expected_directive(curr_line->line, DATA_DIRECTIVE)) {
+                    /* encode data with following args */
+                    if ((L = encode_data_direc(curr_line->line, mem, line_number)) == WORDS_NUM_ERROR) {
+                        error_flag = TRUE;
+                        break;
+                    }
+                }
+                else if (is_expected_directive(curr_line->line, STRING_DIRECTIVE)) {
+                    /* encode string with following args */
+                    if ((L = encode_string_direc(curr_line->line, mem, line_number)) == WORDS_NUM_ERROR) {
+                        error_flag = TRUE;
+                        break;
+                    }
+                }
+                else if (is_expected_directive(curr_line->line, MAT_DIRECTIVE)) {
+                    /* encode mat with following args */
+                    if ((L = encode_mat_direc(curr_line->line, mem, line_number)) == WORDS_NUM_ERROR) {
+                        error_flag = TRUE;
+                        break;
+                    }
+                }
+                else {
+                    fprintf(stderr, "Error in line %d: wrong directive name '%s'\n", line_number, curr_line->line);
+                    error_flag = TRUE;
+                }
+                
+                *DC += L;  /* update data counter */
                 break;
 
             case INSTRUCTION:
+                if (is_label) {  /* fill label fields, if there is one */
+                    set_label_fields(label, CODE, *IC);
+                }
+                is_label = FALSE;  /* reset label flag */
+
                 /* validate operands number */
                 if ((num_of_operands = get_num_of_operands(curr_line->line, line_number)) == OPERANDS_NUM_ERROR) {
                     error_flag = TRUE;
@@ -104,7 +142,8 @@ int run_first_pass(char *filename, int *IC, int *DC, MemoryUnit **mem, Label **l
                 break;
 
             default:
-                fprintf(stderr, "Argument error in line %d: unrecognized argument\n", line_number);
+                fprintf(stderr, "Argument error in line %d: unrecognized argument - %s\n",
+                        line_number, curr_line->line);
                 error_flag = TRUE;
         }
 

@@ -1,6 +1,36 @@
 #include "../hdr/encoding.h"
 
 
+int get_num_of_operands(char *line, int line_number) {
+    char *line_args, *line_copy;
+    int num_of_args = 0;
+
+    /* copy line for processing */
+    line_copy = strdup(line);
+    /* tokenize with different delimiters */
+    line_args = strtok(line_copy, OP_DELIMITERS);
+
+    while (line_args != NULL) {
+        num_of_args++;
+        
+        /* get next token/arg */
+        line_args = strtok(NULL, OP_DELIMITERS);
+    }
+
+    /* discount operation name from count */
+    num_of_args--;
+
+    /* validate number of operands */
+    if (!is_operands_num_valid(line, num_of_args)) {
+        fprintf(stderr, "Error in line %d: invalid number of operands\n", line_number);
+        num_of_args = OPERANDS_NUM_ERROR;
+    }
+
+    free(line_copy);
+    return num_of_args;
+}
+
+
 void encode_operand_8_bit(Word *word, int operand_value) {
     /* write the 8-bit value to fields starting from msb */
     word->dest_operand =  UINT_BITS_TO_DEST(operand_value);
@@ -102,14 +132,14 @@ int encode_both_registers(MemoryUnit **table, char *line_args, int line_number, 
 }
 
 
-/* --------------------------------- First Pass ---------------------------------- */
+/* --------------------------------- Code ---------------------------------- */
 
-int encode_operation(MemoryUnit **table,
-                     char *op_name,
-                     unsigned int dest_operand,
-                     unsigned int src_operand,
-                     int line_number,
-                     int *L) {
+int encode_op_name(MemoryUnit **table,
+                   char *op_name,
+                   unsigned int dest_operand,
+                   unsigned int src_operand,
+                   int line_number,
+                   int *L) {
     int id;  /* array index */
     unsigned int encoding_type, opcode;
     MemoryUnit *new;
@@ -325,8 +355,8 @@ int encode_instruction(char *op_line,
         return WORDS_NUM_ERROR;  /* encoding failed */
     }
 
-    /* encode operation */
-    if (encode_operation(table, op_name, dest_operand, src_operand, line_number, &L) == STATUS_CODE_ERR) {
+    /* encode operation name */
+    if (encode_op_name(table, op_name, dest_operand, src_operand, line_number, &L) == STATUS_CODE_ERR) {
         free(line_copy);
         free(op_name);
         return WORDS_NUM_ERROR;  /* encoding failed */
@@ -351,4 +381,48 @@ int encode_instruction(char *op_line,
     free(line_copy);
     free(op_name);
     return L;
+}
+
+
+/* --------------------------------- Data ---------------------------------- */
+
+int encode_data_direc(char *line, MemoryUnit **table, int line_number) {
+    char *line_args, *line_copy;
+    /* words and args counter */
+    int L = 0, arg_id = 0;
+
+    /* copy line for processing */
+    line_copy = strdup(line);
+    /* tokenize with different delimiters */
+    line_args = strtok(line_copy, OP_DELIMITERS);
+
+    while (line_args != NULL) {
+        if (arg_id > FIRST_ARG) {  /* skip directive name */
+            
+        }
+
+        /* get next token/arg */
+        line_args = strtok(NULL, OP_DELIMITERS);
+        arg_id++;
+    }
+
+    free(line_copy);
+
+    /* check if number of words is not exceeded */
+    if (L > MAX_WORDS_IN_SENTENCE) {            
+        fprintf(stderr, "Error in line %d: too many words in sentence\n", line_number);
+        return WORDS_NUM_ERROR;  /* too many words */
+    }
+
+    return L;  /* return number of words encoded */
+}
+
+
+int encode_string_direc(char *line, MemoryUnit **table, int line_number) {
+    return 0;
+}
+
+
+int encode_mat_direc(char *line, MemoryUnit **table, int line_number) {
+    return 0;
 }

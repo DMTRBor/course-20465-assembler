@@ -238,33 +238,3 @@ LineArg detect_and_validate_first_arg(char *line, int line_number) {
     free(line_copy);
     return line_arg_type;
 }
-
-
-int get_num_of_operands(char *line, int line_number) {
-    char *line_args, *line_copy;
-    int num_of_args = 0;
-
-    /* copy line for processing */
-    line_copy = strdup(line);
-    /* tokenize with different delimiters */
-    line_args = strtok(line_copy, OP_DELIMITERS);
-
-    while (line_args != NULL) {
-        num_of_args++;
-        
-        /* get next token/arg */
-        line_args = strtok(NULL, OP_DELIMITERS);
-    }
-
-    /* discount operation name from count */
-    num_of_args--;
-
-    /* validate number of operands */
-    if (!is_operands_num_valid(line, num_of_args)) {
-        fprintf(stderr, "Error in line %d: invalid number of operands\n", line_number);
-        num_of_args = OPERANDS_NUM_ERROR;
-    }
-
-    free(line_copy);
-    return num_of_args;
-}

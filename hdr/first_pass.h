@@ -8,6 +8,6 @@
 #include "../hdr/encoding.h"
 
 
-int run_first_pass(char *, int *, int *, MemoryUnit **, Label **);
+int run_first_pass(char *, unsigned int *, unsigned int *, MemoryUnit **, Label **);
 
 #endif

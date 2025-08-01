@@ -105,16 +105,13 @@ Label* new_label(void) {
 }
 
 
-void set_label_fields(Label *label, int type, char *name, unsigned int address) {
+void set_label_fields(Label *label, int type, unsigned int address) {
     if (label == NULL)
         return;
     
+    /* label name set previously */
     label->type = type;
     label->address = address;
-    
-    /* allocate and copy new name */
-    label->name = (char*)malloc(strlen(name) + 1);
-    strcpy(label->name, name);
 }
 
 
@@ -164,9 +161,7 @@ int is_label_exists(Label **head, Label *label) {
     current = *head;
     /* search in labels table */
     while (current != NULL) {
-        if (current->type == label->type &&
-            current->address == label->address &&
-            strcmp(current->name, label->name) == STR_EQUAL) {
+        if (strcmp(current->name, label->name) == STR_EQUAL) {
             return TRUE;  /* label exists */
         }
         current = current->next;

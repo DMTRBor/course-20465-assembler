@@ -208,6 +208,24 @@ int is_register(char *arg) {
 }
 
 
+int is_expected_directive(char *direc, char *expected) {
+    char *line_args, *line_copy;
+    /* words and args counter */
+    int is_expected = FALSE;
+
+    /* copy line for processing */
+    line_copy = strdup(direc);
+    /* tokenize with different delimiters */
+    line_args = strtok(line_copy, OP_DELIMITERS);
+
+    if (strcmp(line_args, expected) == STR_EQUAL)
+        is_expected = TRUE;
+
+    free(line_copy);
+    return is_expected;
+}
+
+
 LineArg get_operand_type(char *operand) {
     LineArg operand_type = ERROR;
     int id;

@@ -15,7 +15,7 @@ LOOP: jmp END
 
 	  a_mc
 END: stop
-STR: .string “abcdef”
+STR: .string "abcdef"
 LENGTH: .data 6,-9,15
 LOOP: jmp END
 	  sub r1, r4
