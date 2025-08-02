@@ -84,33 +84,33 @@ FILE* open_file(char *filename, char *permission) {
  * This function receives a line
  */
 LineArg detect_arg_type(char *line) {
-    char *line_args, *line_copy;
+    char *line_arg, *line_copy;
     LineArg line_arg_type = ERROR;
 
     /* copy line for processing */
     line_copy = strdup(line);
     /* tokenize with whitespaces */
-    line_args = strtok(line_copy, WHITESPACE);
+    line_arg = strtok(line_copy, WHITESPACE);
 
-    while (line_args != NULL) {
-        if (strcmp(line_args, NEWLINE_STR) == STR_EQUAL) {
+    while (line_arg != NULL) {
+        if (strcmp(line_arg, NEWLINE_STR) == STR_EQUAL) {
             line_arg_type = EMPTY_LINE;
             break;
         }
-        else if (line_args[0] == COMMENT_SIGN) {
+        else if (line_arg[0] == COMMENT_SIGN) {
             line_arg_type = COMMENT;
             break;
         }
-        else if (strcmp(line_args, MACRO_START) == STR_EQUAL) {
+        else if (strcmp(line_arg, MACRO_START) == STR_EQUAL) {
             line_arg_type = MCRO;
             break;
         }
-        else if (strcmp(line_args, MACRO_END) == STR_EQUAL) {
+        else if (strcmp(line_arg, MACRO_END) == STR_EQUAL) {
             line_arg_type = MCROEND;
             break;
         }
         /* next token/arg */
-        line_args = strtok(NULL, WHITESPACE);
+        line_arg = strtok(NULL, WHITESPACE);
     }
 
     free(line_copy);
@@ -121,43 +121,43 @@ LineArg detect_arg_type(char *line) {
 /* -------------------------- Pre-Assembler -------------------------- */
 
 char* get_macro_name(char *line) {
-    char *line_args;
+    char *line_arg;
     int arg_id = 0;  /* token index */
 
     /* tokenize with whitespaces */
-    line_args = strtok(line, WHITESPACE);
+    line_arg = strtok(line, WHITESPACE);
 
-    while (line_args != NULL) {
+    while (line_arg != NULL) {
         /* macro name goes after mcro label */
         if (arg_id == 1)
             break;
 
         /* next token/arg */
-        line_args = strtok(NULL, WHITESPACE);
+        line_arg = strtok(NULL, WHITESPACE);
         arg_id++;
     }
 
-    return line_args;
+    return line_arg;
 }
 
 
 int is_macro_call(char *line, char *macro_name) {
-    char *line_args, *line_copy;
+    char *line_arg, *line_copy;
 
     /* copy line for processing */
     line_copy = strdup(line);
     /* tokenize with whitespaces */
-    line_args = strtok(line_copy, WHITESPACE);
+    line_arg = strtok(line_copy, WHITESPACE);
 
-    while (line_args != NULL) {
+    while (line_arg != NULL) {
         /* macro called */
-        if (strcmp(line_args, macro_name) == STR_EQUAL) {
+        if (strcmp(line_arg, macro_name) == STR_EQUAL) {
             free(line_copy);
             return TRUE;
         }
 
         /* next token/arg */
-        line_args = strtok(NULL, WHITESPACE);
+        line_arg = strtok(NULL, WHITESPACE);
     }
 
     free(line_copy);
@@ -209,16 +209,16 @@ int is_register(char *arg) {
 
 
 int is_expected_directive(char *direc, char *expected) {
-    char *line_args, *line_copy;
+    char *line_arg, *line_copy;
     /* words and args counter */
     int is_expected = FALSE;
 
     /* copy line for processing */
     line_copy = strdup(direc);
     /* tokenize with different delimiters */
-    line_args = strtok(line_copy, OP_DELIMITERS);
+    line_arg = strtok(line_copy, OP_DELIMITERS);
 
-    if (strcmp(line_args, expected) == STR_EQUAL)
+    if (strcmp(line_arg, expected) == STR_EQUAL)
         is_expected = TRUE;
 
     free(line_copy);
@@ -310,4 +310,38 @@ char* get_label_name(char **line_with_label) {
     /* point to what goes after the label */
     *line_with_label = lbl_end;
     return label_name;
+}
+
+
+int to_int(char *num_str, int *num_int, int line_number) {
+    char *end;
+    long value;
+    
+    /* check if string is empty or null */
+    if (num_str == NULL || *num_str == NULL_TERMINATOR) {
+        fprintf(stderr, "Error in line %d: empty or null string cannot be converted to integer\n",
+                        line_number);
+        return STATUS_CODE_ERR;
+    }
+    
+    /* convert string to long */
+    value = strtol(num_str, &end, BASE_10);
+
+    /* check if conversion was successful (no remaining characters) */
+    if (*end != NULL_TERMINATOR) {
+        fprintf(stderr, "Error in line %d: '%s' is not a valid integer\n",
+                        line_number, num_str);
+        return STATUS_CODE_ERR;
+    }
+    
+    /* check if value is within int range */
+    if (value > INT_MAX || value < INT_MIN) {
+        fprintf(stderr, "Error in line %d: value '%ld' is out of integer range\n",
+                        line_number, value);
+        return STATUS_CODE_ERR;
+    }
+    
+    /* store converted value */
+    *num_int = (int)value;
+    return STATUS_CODE_OK;
 }

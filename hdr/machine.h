@@ -79,4 +79,11 @@ extern ExpectedNumOfOperands expected_num_of_operands[];
 
 #define NUM_OF_REGISTERS 8
 
+/**
+ * range of values for 10-bit
+ * signed integer, using 2s complement
+ */
+#define MAX_10_BIT_VALUE 511
+#define MIN_10_BIT_VALUE -512
+
 #endif

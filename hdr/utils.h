@@ -121,4 +121,6 @@ void set_word_operand_field(LineArg, int, int, unsigned int *, unsigned int *);
 
 char* get_label_name(char **);
 
+int to_int(char *, int *, int);
+
 #endif

@@ -37,19 +37,19 @@ int is_macro_name_valid(char *line, int line_number) {
 
 
 int is_macro_args_num_valid(char *line, int num_of_expected_args) {
-    char *line_args, *line_copy;
+    char *line_arg, *line_copy;
     int num_of_args = 0;  /* number of args in line */
 
     /* copy line for processing */
     line_copy = strdup(line);
     /* tokenize with whitespaces */
-    line_args = strtok(line_copy, WHITESPACE);
+    line_arg = strtok(line_copy, WHITESPACE);
 
-    while (line_args != NULL) {
+    while (line_arg != NULL) {
         /* count argument */
         num_of_args++;
         /* next token/arg */
-        line_args = strtok(NULL, WHITESPACE);
+        line_arg = strtok(NULL, WHITESPACE);
     }
 
     free(line_copy);
@@ -211,27 +211,27 @@ int is_legal_addressing_methods(char *op_name, unsigned int dest_operand,
 /* ---------------------------------------------------------------------- */
 
 LineArg detect_and_validate_first_arg(char *line, int line_number) {
-    char *line_args, *line_copy;
+    char *line_arg, *line_copy;
     LineArg line_arg_type = ERROR;
 
     /* copy line for processing */
     line_copy = strdup(line);
     /* tokenize with whitespaces */
-    line_args = strtok(line_copy, WHITESPACE);
+    line_arg = strtok(line_copy, WHITESPACE);
 
-    if (*line == NULL_TERMINATOR || strcmp(line_args, NEWLINE_STR) == STR_EQUAL) {
+    if (*line == NULL_TERMINATOR || strcmp(line_arg, NEWLINE_STR) == STR_EQUAL) {
         line_arg_type = EMPTY_LINE;
     }
-    else if (line_args[0] == COMMENT_SIGN) {
+    else if (line_arg[0] == COMMENT_SIGN) {
         line_arg_type = COMMENT;
     }
-    else if (is_operation(line_args)) {
+    else if (is_operation(line_arg)) {
         line_arg_type = INSTRUCTION;
     }
-    else if (is_directive(line_args)) {
+    else if (is_directive(line_arg)) {
         line_arg_type = DIRECTIVE;
     }
-    else if (is_valid_label(line_args, line_number)) {
+    else if (is_valid_label(line_arg, line_number)) {
         line_arg_type = LABEL;
     }
 

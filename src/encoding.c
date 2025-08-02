@@ -2,19 +2,19 @@
 
 
 int get_num_of_operands(char *line, int line_number) {
-    char *line_args, *line_copy;
+    char *line_arg, *line_copy;
     int num_of_args = 0;
 
     /* copy line for processing */
     line_copy = strdup(line);
     /* tokenize with different delimiters */
-    line_args = strtok(line_copy, OP_DELIMITERS);
+    line_arg = strtok(line_copy, OP_DELIMITERS);
 
-    while (line_args != NULL) {
+    while (line_arg != NULL) {
         num_of_args++;
         
         /* get next token/arg */
-        line_args = strtok(NULL, OP_DELIMITERS);
+        line_arg = strtok(NULL, OP_DELIMITERS);
     }
 
     /* discount operation name from count */
@@ -36,6 +36,15 @@ void encode_operand_8_bit(Word *word, int operand_value) {
     word->dest_operand =  UINT_BITS_TO_DEST(operand_value);
     word->src_operand  =  UINT_BITS_TO_SRC(operand_value);
     word->opcode       =  UINT_BITS_TO_OPCODE(operand_value);
+}
+
+
+void encode_data_10_bit(Word *word, int data_value) {
+    /* write the 10-bit value to all Word fields */
+    word->encoding_type = INT_BITS_TO_ENC_TYPE(data_value);
+    word->dest_operand  = INT_BITS_TO_DEST(data_value);
+    word->src_operand   = INT_BITS_TO_SRC(data_value);
+    word->opcode        = INT_BITS_TO_OPCODE(data_value);
 }
 
 
@@ -96,35 +105,35 @@ int encode_matrix_row_col(Word *word, char *operand, int line_number) {
 }
 
 
-int encode_both_registers(MemoryUnit **table, char *line_args, int line_number, int *L) {
+int encode_both_registers(MemoryUnit **table, char *line_arg, int line_number, int *L) {
     MemoryUnit *new;
 
     /* validate first register */
-    if (!is_register(line_args)) {
-        fprintf(stderr, "Error in line %d: invalid register number '%s'\n", line_number, line_args);
+    if (!is_register(line_arg)) {
+        fprintf(stderr, "Error in line %d: invalid register number '%s'\n", line_number, line_arg);
         return STATUS_CODE_ERR;  /* invalid register */
     }
 
     /* allocate new memory unit */
     if ((new = new_mem_unit()) == NULL) {
-        fprintf(stderr, "Memory allocation error in line %d, operand %s\n", line_number, line_args);
+        fprintf(stderr, "Memory allocation error in line %d, operand %s\n", line_number, line_arg);
         return STATUS_CODE_ERR;  /* memory allocation failed */
     }
 
     new->encoded_value.encoding_type = A;
     encode_operand_first_index(&new->encoded_value,
-                                (unsigned int)strtoul(line_args + 1, NULL, BASE_10));
+                                (unsigned int)strtoul(line_arg + 1, NULL, BASE_10));
 
     /* get next operand */
-    line_args = strtok(NULL, OP_DELIMITERS);
+    line_arg = strtok(NULL, OP_DELIMITERS);
     /* validate second register */
-    if (!is_register(line_args)) {
-        fprintf(stderr, "Error in line %d: invalid register number '%s'\n", line_number, line_args);
+    if (!is_register(line_arg)) {
+        fprintf(stderr, "Error in line %d: invalid register number '%s'\n", line_number, line_arg);
         return STATUS_CODE_ERR;  /* invalid register */
     }
     
     encode_operand_sec_index(&new->encoded_value,
-                            (unsigned int)strtoul(line_args + 1, NULL, BASE_10));
+                            (unsigned int)strtoul(line_arg + 1, NULL, BASE_10));
     /* add new memory unit to table, increment words counter */
     add_unit_and_increment_L(table, new, L);
 
@@ -255,7 +264,7 @@ int encode_operand_by_type(char *operand, int is_src, unsigned int operand_type,
 int encode_operands(MemoryUnit **table, char *op_line,
                     unsigned int dest_operand, unsigned int src_operand,
                     int line_number, int *L, int num_of_operands) {
-    char *line_args, *line_copy;
+    char *line_arg, *line_copy, *dest_arg;
     
     /* no operands, no need to encode */
     if (num_of_operands == NO_OPERANDS) {
@@ -265,29 +274,31 @@ int encode_operands(MemoryUnit **table, char *op_line,
     /* copy line for processing */
     line_copy = strdup(op_line);
     /* tokenize with different delimiters */
-    line_args = strtok(line_copy, OP_DELIMITERS);
+    line_arg = strtok(line_copy, OP_DELIMITERS);
     /* cut operation name */
-    line_args = strtok(NULL, OP_DELIMITERS);
+    line_arg = strtok(NULL, OP_DELIMITERS);
     
     /* source and destination */
     if (num_of_operands == SRC_AND_DEST) {
         if (src_operand == REG && dest_operand == REG) {  /* both operands are registers */
-            if (encode_both_registers(table, line_args, line_number, L) == STATUS_CODE_ERR) {
+            if (encode_both_registers(table, line_arg, line_number, L) == STATUS_CODE_ERR) {
                 free(line_copy);
                 return STATUS_CODE_ERR;
             }
         }
         /* operands are not both registers */
         else {
+            /* extract destination operand (avoids arg override by strtok) */
+            dest_arg = strtok(NULL, OP_DELIMITERS);
+            
             /* encode source operand */
-            if (encode_operand_by_type(line_args, TRUE, src_operand, line_number, L, table) == STATUS_CODE_ERR) {
+            if (encode_operand_by_type(line_arg, TRUE, src_operand, line_number, L, table) == STATUS_CODE_ERR) {
                 free(line_copy);
                 return STATUS_CODE_ERR;  /* encoding failed */
             }
-            /* get next operand */
-            line_args = strtok(NULL, OP_DELIMITERS);
+            
             /* encode destination operand */
-            if (encode_operand_by_type(line_args, FALSE, dest_operand, line_number, L, table) == STATUS_CODE_ERR) {
+            if (encode_operand_by_type(dest_arg, FALSE, dest_operand, line_number, L, table) == STATUS_CODE_ERR) {
                 free(line_copy);
                 return STATUS_CODE_ERR;  /* encoding failed */
             }
@@ -295,7 +306,7 @@ int encode_operands(MemoryUnit **table, char *op_line,
     }
     /* destination only */
     else {  /* encode destination operand */
-        if (encode_operand_by_type(line_args, FALSE, dest_operand, line_number, L, table) == STATUS_CODE_ERR) {
+        if (encode_operand_by_type(line_arg, FALSE, dest_operand, line_number, L, table) == STATUS_CODE_ERR) {
             free(line_copy);
             return STATUS_CODE_ERR;  /* encoding failed */
         }
@@ -310,7 +321,7 @@ int encode_instruction(char *op_line,
                        int num_of_operands,
                        MemoryUnit **table,
                        int line_number) {
-    char *line_args, *line_copy, *op_name;
+    char *line_arg, *line_copy, *op_name;
     LineArg operand_type;
 
     /* word fields -initialize with zeros */
@@ -323,15 +334,15 @@ int encode_instruction(char *op_line,
     /* copy line for processing */
     line_copy = strdup(op_line);
     /* tokenize with different delimiters */
-    line_args = strtok(line_copy, OP_DELIMITERS);
+    line_arg = strtok(line_copy, OP_DELIMITERS);
     
     /* extract info for operation encoding */
-    while (line_args != NULL) {
+    while (line_arg != NULL) {
         if (arg_id == FIRST_ARG)  /* get operation name */
-            op_name = strdup(line_args);
+            op_name = strdup(line_arg);
         else {
-            if ((operand_type = get_operand_type(line_args)) == ERROR) {
-                fprintf(stderr, "Error in line %d: invalid operand type - %s\n", line_number, line_args);
+            if ((operand_type = get_operand_type(line_arg)) == ERROR) {
+                fprintf(stderr, "Error in line %d: invalid operand type - %s\n", line_number, line_arg);
                 free(line_copy);
                 free(op_name);
                 return WORDS_NUM_ERROR;  /* invalid operand type */
@@ -343,7 +354,7 @@ int encode_instruction(char *op_line,
         }
 
         /* get next token/arg */
-        line_args = strtok(NULL, OP_DELIMITERS);
+        line_arg = strtok(NULL, OP_DELIMITERS);
         arg_id++;
     }
 
@@ -387,22 +398,45 @@ int encode_instruction(char *op_line,
 /* --------------------------------- Data ---------------------------------- */
 
 int encode_data_direc(char *line, MemoryUnit **table, int line_number) {
-    char *line_args, *line_copy;
+    char *line_arg, *line_copy;
     /* words and args counter */
-    int L = 0, arg_id = 0;
+    int L = 0, arg_id = 0, arg_val = MIN_10_BIT_VALUE;
+
+    MemoryUnit *new;
 
     /* copy line for processing */
     line_copy = strdup(line);
     /* tokenize with different delimiters */
-    line_args = strtok(line_copy, OP_DELIMITERS);
+    line_arg = strtok(line_copy, OP_DELIMITERS);
 
-    while (line_args != NULL) {
+    while (line_arg != NULL) {
         if (arg_id > FIRST_ARG) {  /* skip directive name */
-            
+            if (to_int(line_arg, &arg_val, line_number) == STATUS_CODE_ERR) {
+                free(line_copy);
+                return WORDS_NUM_ERROR;
+            }
+
+            /* validate number range */
+            if (arg_val < MIN_10_BIT_VALUE || arg_val > MAX_10_BIT_VALUE) {
+                fprintf(stderr, "Error in line %d: argument value '%s' out of range. Must be between %d and %d\n",
+                        line_number, line_arg, MIN_10_BIT_VALUE, MAX_10_BIT_VALUE);
+                free(line_copy);
+                return WORDS_NUM_ERROR;
+            }
+
+            if ((new = new_mem_unit()) == NULL) {  /* allocate memory unit */
+                fprintf(stderr, "Memory allocation error in line %d, argument value %d\n", line_number, arg_val);
+                return WORDS_NUM_ERROR;  /* memory allocation failed */
+            }
+
+            /* encode data value */
+            encode_data_10_bit(&new->encoded_value, arg_val);
+            /* add new memory unit to table, increment words counter */
+            add_unit_and_increment_L(table, new, &L);
         }
 
         /* get next token/arg */
-        line_args = strtok(NULL, OP_DELIMITERS);
+        line_arg = strtok(NULL, OP_DELIMITERS);
         arg_id++;
     }
 

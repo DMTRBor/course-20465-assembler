@@ -17,8 +17,14 @@
 #define UINT_BITS_TO_OPCODE(val)    (((val) >> 4)  & 0xF)
 #define UINT_TO_UPPER_4_BITS(val)    ((val)        & 0xF)
 
+#define INT_BITS_TO_ENC_TYPE(val)       ((val)        & 0x3)
+#define INT_BITS_TO_DEST(val)          (((val) >> 2)  & 0x3)
+#define INT_BITS_TO_SRC(val)           (((val) >> 4)  & 0x3)
+#define INT_BITS_TO_OPCODE(val)        (((val) >> 6)  & 0xF)
+
 int get_num_of_operands(char *, int);
 void encode_operand_8_bit(Word *, int);
+void encode_data_10_bit(Word *, int);
 void encode_operand_first_index(Word *, unsigned int);
 void encode_operand_sec_index(Word *, unsigned int);
 int encode_matrix_row_col(Word *, char *, int);
