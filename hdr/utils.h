@@ -26,6 +26,7 @@
 #define MACRO_END "mcroend"
 #define LABEL_END_SIGN ':'
 #define DIRECTIVE_SIGN "."
+#define QUOTATION_MARK '"'
 #define IMMEDIATE_ADDR_SIGN '#'
 #define REGISTER_PREFIX "r"
 #define MAT_LEFT_BRACE '['
@@ -35,6 +36,8 @@
 
 #define WHITESPACE " \t"
 #define OP_DELIMITERS " \t\r,"
+#define MAT_DELIMITERS " \t\r[]"
+
 #define NEWLINE_CHAR '\n'
 #define NULL_TERMINATOR '\0'
 #define UNDERSCORE '_'
@@ -57,6 +60,11 @@
 #define SEC_ARG_ID 2
 
 #define IC_DC_RESET_VALUE 0
+
+/* matrix encoding */
+#define MIN_MAT_SIZE 1
+#define MAX_MAT_SIZE 15
+#define ILLEGAL_MAT_SIZE 0
 
 /* max for 255 max value */
 #define MAX_DIGITS_BASE_4 5
@@ -97,10 +105,32 @@ typedef enum {
 } LineArg;
 
 
-/* forward declarations */
+/**
+ * This function receives a decimal number string
+ * representation and an empty string, converts the
+ * decimal number to base 4 representation
+ * and places the converted string representation of
+ * the number in base 4 in an empty string.
+ */
 void decimal_to_base4(char *, char *);
 
+/**
+ * This function receives a data
+ * stream read from a file and
+ * returns the size of the stream/
+ * content in bytes.
+ */
 long file_content_size(FILE*);
+
+/**
+ * This function receives a string
+ * that represents a filename, opens
+ * the file for reading and returns a
+ * pointer to file if succeeded in
+ * reading the content. If failed to
+ * read from file (not exitent, permission),
+ * the function returns null.
+ */
 FILE* open_file(char *, char *);
 
 /* Pre-Assembler */
@@ -114,6 +144,7 @@ int is_directive(char *);
 int is_register(char *);
 int is_expected_directive(char *, char *);
 
+int get_num_of_operands(char *);
 LineArg get_operand_type(char *);
 AddrMethodCode get_operand_code_from_type(LineArg);
 
@@ -122,5 +153,7 @@ void set_word_operand_field(LineArg, int, int, unsigned int *, unsigned int *);
 char* get_label_name(char **);
 
 int to_int(char *, int *, int);
+
+int get_mat_size(char *);
 
 #endif

@@ -1,36 +1,6 @@
 #include "../hdr/encoding.h"
 
 
-int get_num_of_operands(char *line, int line_number) {
-    char *line_arg, *line_copy;
-    int num_of_args = 0;
-
-    /* copy line for processing */
-    line_copy = strdup(line);
-    /* tokenize with different delimiters */
-    line_arg = strtok(line_copy, OP_DELIMITERS);
-
-    while (line_arg != NULL) {
-        num_of_args++;
-        
-        /* get next token/arg */
-        line_arg = strtok(NULL, OP_DELIMITERS);
-    }
-
-    /* discount operation name from count */
-    num_of_args--;
-
-    /* validate number of operands */
-    if (!is_operands_num_valid(line, num_of_args)) {
-        fprintf(stderr, "Error in line %d: invalid number of operands\n", line_number);
-        num_of_args = OPERANDS_NUM_ERROR;
-    }
-
-    free(line_copy);
-    return num_of_args;
-}
-
-
 void encode_operand_8_bit(Word *word, int operand_value) {
     /* write the 8-bit value to fields starting from msb */
     word->dest_operand =  UINT_BITS_TO_DEST(operand_value);
@@ -122,7 +92,7 @@ int encode_both_registers(MemoryUnit **table, char *line_arg, int line_number, i
 
     new->encoded_value.encoding_type = A;
     encode_operand_first_index(&new->encoded_value,
-                                (unsigned int)strtoul(line_arg + 1, NULL, BASE_10));
+                               (unsigned int)strtoul(line_arg + 1, NULL, BASE_10));
 
     /* get next operand */
     line_arg = strtok(NULL, OP_DELIMITERS);
@@ -138,6 +108,23 @@ int encode_both_registers(MemoryUnit **table, char *line_arg, int line_number, i
     add_unit_and_increment_L(table, new, L);
 
     return STATUS_CODE_OK;  /* encoding succeeded */
+}
+
+
+int encode_directive_number(MemoryUnit **table, int number, int line_number, int *L) {
+    MemoryUnit *new;
+
+    if ((new = new_mem_unit()) == NULL) {  /* allocate memory unit */
+        fprintf(stderr, "Memory allocation error in line %d, argument value %d\n", line_number, number);
+        return STATUS_CODE_ERR;  /* memory allocation failed */
+    }
+
+    /* encode number value */
+    encode_data_10_bit(&new->encoded_value, number);
+    /* add new memory unit to table, increment words counter */
+    add_unit_and_increment_L(table, new, L);
+
+    return STATUS_CODE_OK;
 }
 
 
@@ -402,8 +389,6 @@ int encode_data_direc(char *line, MemoryUnit **table, int line_number) {
     /* words and args counter */
     int L = 0, arg_id = 0, arg_val = MIN_10_BIT_VALUE;
 
-    MemoryUnit *new;
-
     /* copy line for processing */
     line_copy = strdup(line);
     /* tokenize with different delimiters */
@@ -416,23 +401,10 @@ int encode_data_direc(char *line, MemoryUnit **table, int line_number) {
                 return WORDS_NUM_ERROR;
             }
 
-            /* validate number range */
-            if (arg_val < MIN_10_BIT_VALUE || arg_val > MAX_10_BIT_VALUE) {
-                fprintf(stderr, "Error in line %d: argument value '%s' out of range. Must be between %d and %d\n",
-                        line_number, line_arg, MIN_10_BIT_VALUE, MAX_10_BIT_VALUE);
+            if (encode_directive_number(table, arg_val, line_number, &L) == STATUS_CODE_ERR) {
                 free(line_copy);
                 return WORDS_NUM_ERROR;
             }
-
-            if ((new = new_mem_unit()) == NULL) {  /* allocate memory unit */
-                fprintf(stderr, "Memory allocation error in line %d, argument value %d\n", line_number, arg_val);
-                return WORDS_NUM_ERROR;  /* memory allocation failed */
-            }
-
-            /* encode data value */
-            encode_data_10_bit(&new->encoded_value, arg_val);
-            /* add new memory unit to table, increment words counter */
-            add_unit_and_increment_L(table, new, &L);
         }
 
         /* get next token/arg */
@@ -453,10 +425,115 @@ int encode_data_direc(char *line, MemoryUnit **table, int line_number) {
 
 
 int encode_string_direc(char *line, MemoryUnit **table, int line_number) {
-    return 0;
+    char *line_arg, *line_copy;
+    /* words and args counter */
+    int L = 0, arg_id = 0, arg_ascii = 0, ch_id;
+
+    /* copy line for processing */
+    line_copy = strdup(line);
+    /* tokenize with different delimiters */
+    line_arg = strtok(line_copy, OP_DELIMITERS);
+
+    while (line_arg != NULL) {
+        if (arg_id > FIRST_ARG) {  /* skip directive name */
+            /* encode characters in the string */
+            for (ch_id = 0; line_arg[ch_id] != NULL_TERMINATOR; ch_id++) {
+                if (line_arg[ch_id] == QUOTATION_MARK) {
+                    continue;  /* skip quotation marks */
+                }
+
+                /* 7/8 bits ASCII, will not exceed 10 bits */
+                /* get character to ascii value */
+                arg_ascii = (int)line_arg[ch_id];
+
+                if (encode_directive_number(table, arg_ascii, line_number, &L) == STATUS_CODE_ERR) {
+                    free(line_copy);
+                    return WORDS_NUM_ERROR;
+                }
+            }
+            /* encode null terminator */
+            if (encode_directive_number(table, NULL_TERMINATOR_ASCII,
+                                        line_number, &L) == STATUS_CODE_ERR) {
+                free(line_copy);
+                return WORDS_NUM_ERROR;
+            }
+        }
+
+        /* get next token/arg */
+        line_arg = strtok(NULL, OP_DELIMITERS);
+        arg_id++;
+    }
+
+    free(line_copy);
+
+    /* each word encoded independently - no limit on total words */
+    return L;  /* return number of words encoded */
 }
 
 
 int encode_mat_direc(char *line, MemoryUnit **table, int line_number) {
-    return 0;
+    char *line_arg, *line_copy, *mat_vals;
+    /* words and args counter */
+    int L = 0, arg_id = 0;
+    int val = MIN_10_BIT_VALUE, mat_size, mat_id; /* for matrix */
+
+    /* copy line for processing */
+    line_copy = strdup(line);
+    /* tokenize with different delimiters */
+    line_arg = strtok(line_copy, OP_DELIMITERS);
+
+    while (line_arg != NULL) {
+        if (arg_id > FIRST_ARG) {  /* skip directive name */
+            if (line_arg[0] == MAT_LEFT_BRACE) {  /* matrix dimensions detected */
+                if ((mat_size = get_mat_size(line_arg)) == ILLEGAL_MAT_SIZE) {
+                    fprintf(stderr, "Error in line %d: illegal matrix size '%d'\n", line_number, mat_size);
+                    free(line_copy);
+                    return WORDS_NUM_ERROR;  /* illegal matrix size */
+                }
+            }
+
+            /* copy for matrix processing (avoids token override) */
+            mat_vals = strdup(line);
+            /* go to matrix values (if provided) */
+            mat_vals = strtok(NULL, OP_DELIMITERS);  /* skip directive name */
+            mat_vals = strtok(NULL, OP_DELIMITERS);  /* skip matrix dimensions */
+
+            /* allocate memory for matrix values */
+            for (mat_id = 0; mat_id < mat_size; mat_id++) {
+                /* try to get next token/arg */
+                if (mat_vals != NULL) {
+                    if (to_int(mat_vals, &val, line_number) == STATUS_CODE_ERR) {
+                        free(line_copy);
+                        free(mat_vals);
+                        return WORDS_NUM_ERROR;  /* conversion error */
+                    }
+                    /* go to next value */
+                    mat_vals = strtok(NULL, OP_DELIMITERS);
+                }
+                else  /* no values were provided, allocate and fill with zeros */
+                    val = 0;
+
+                if (encode_directive_number(table, val, line_number, &L) == STATUS_CODE_ERR) {
+                    free(line_copy);
+                    free(mat_vals);
+                    return WORDS_NUM_ERROR;  /* encoding failed */
+                }
+            }
+        }
+
+        /* get next token/arg */
+        line_arg = strtok(NULL, OP_DELIMITERS);
+        arg_id++;
+    }
+
+    free(line_copy);
+    free(mat_vals);
+
+    /* check if number of words is not exceeded */
+    if (L > MAX_WORDS_IN_SENTENCE) {            
+        fprintf(stderr, "Error in line %d: too many words in sentence\n", line_number);
+        return WORDS_NUM_ERROR;  /* too many words */
+    }
+
+    return L;  /* return number of words encoded */
 }

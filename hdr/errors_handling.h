@@ -9,9 +9,6 @@
 #include "../hdr/tables.h"
 #include "../hdr/utils.h"
 
-
-#define OPERANDS_NUM_ERROR -1
-
 /* Pre-Assembler */
 int is_macro_name_valid(char *, int);
 int is_macro_args_num_valid(char *, int);

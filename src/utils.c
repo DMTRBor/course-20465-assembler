@@ -1,13 +1,6 @@
 #include "../hdr/utils.h"
 
 
-/**
- * This function receives a decimal number string
- * representation and an empty string, converts the
- * decimal number to base 4 representation
- * and places the converted string representation of
- * the number in base 4 in an empty string.
- */
 void decimal_to_base4(char *decimal, char *converted) {
     /* temporary converted number storage */
     char temp[MAX_DIGITS_BASE_4 + 1];  /* +1 for null terminator */
@@ -41,12 +34,6 @@ void decimal_to_base4(char *decimal, char *converted) {
 }
 
 
-/**
- * This function receives a data
- * stream read from a file and
- * returns the size of the stream/
- * content in bytes.
- */
 long file_content_size(FILE* fp) {
     long content_size;
 
@@ -58,15 +45,6 @@ long file_content_size(FILE* fp) {
 }
 
 
-/**
- * This function receives a string
- * that represents a filename, opens
- * the file for reading and returns a
- * pointer to file if succeeded in
- * reading the content. If failed to
- * read from file (not exitent, permission),
- * the function returns null.
- */
 FILE* open_file(char *filename, char *permission) {
     FILE *fp = fopen(filename, permission);
 
@@ -80,9 +58,6 @@ FILE* open_file(char *filename, char *permission) {
 }
 
 
-/**
- * This function receives a line
- */
 LineArg detect_arg_type(char *line) {
     char *line_arg, *line_copy;
     LineArg line_arg_type = ERROR;
@@ -226,6 +201,30 @@ int is_expected_directive(char *direc, char *expected) {
 }
 
 
+int get_num_of_operands(char *line) {
+    char *line_arg, *line_copy;
+    int num_of_args = 0;
+
+    /* copy line for processing */
+    line_copy = strdup(line);
+    /* tokenize with different delimiters */
+    line_arg = strtok(line_copy, OP_DELIMITERS);
+
+    while (line_arg != NULL) {
+        num_of_args++;
+        
+        /* get next token/arg */
+        line_arg = strtok(NULL, OP_DELIMITERS);
+    }
+
+    /* discount operation name from count */
+    num_of_args--;
+
+    free(line_copy);
+    return num_of_args;
+}
+
+
 LineArg get_operand_type(char *operand) {
     LineArg operand_type = ERROR;
     int id;
@@ -334,14 +333,47 @@ int to_int(char *num_str, int *num_int, int line_number) {
         return STATUS_CODE_ERR;
     }
     
-    /* check if value is within int range */
-    if (value > INT_MAX || value < INT_MIN) {
-        fprintf(stderr, "Error in line %d: value '%ld' is out of integer range\n",
-                        line_number, value);
+    /* validate number range */
+    if (value < MIN_10_BIT_VALUE || value > MAX_10_BIT_VALUE) {
+        fprintf(stderr, "Error in line %d: argument value '%ld' out of range. Must be between %d and %d\n",
+                line_number, value, MIN_10_BIT_VALUE, MAX_10_BIT_VALUE);
         return STATUS_CODE_ERR;
     }
     
     /* store converted value */
     *num_int = (int)value;
     return STATUS_CODE_OK;
+}
+
+
+int get_mat_size(char *mat_size_str) {
+    char *size_args, *size_copy, *end;
+    int arg_id = 0, size = ILLEGAL_MAT_SIZE;
+    long dim;  /* matrix single dimension */
+
+    /* copy line for processing */
+    size_copy = strdup(mat_size_str);
+    /* tokenize with different delimiters */
+    size_args = strtok(size_copy, MAT_DELIMITERS);
+
+    while (size_args != NULL) {
+        /* get dimension and convert to int */
+        dim = strtol(size_args, &end, BASE_10);
+
+        if (size == ILLEGAL_MAT_SIZE)
+            size = (int)dim;  /* insert first dimension */
+        else
+            size *= (int)dim;  /* calculate total size */
+
+        /* get next token/arg */
+        size_args = strtok(NULL, MAT_DELIMITERS);
+        arg_id++;
+    }
+
+    /* check if size is within valid range */
+    if (size < MIN_MAT_SIZE || size > MAX_MAT_SIZE)
+        size = ILLEGAL_MAT_SIZE;  /* illegal matrix dimensions */
+
+    free(size_copy);
+    return size;  /* return matrix dimensions */
 }

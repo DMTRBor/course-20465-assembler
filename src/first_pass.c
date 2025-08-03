@@ -59,7 +59,7 @@ int run_first_pass(char *filename, unsigned int *IC, unsigned int *DC,
                     break;
                 }
                 
-                /* set label name */
+                /* set new label name and cut from line */
                 label->name = get_label_name(&curr_line->line);
 
                 /* check if label already exists */
@@ -119,14 +119,18 @@ int run_first_pass(char *filename, unsigned int *IC, unsigned int *DC,
                 *DC += L;  /* update data counter */
                 break;
 
-            case INSTRUCTION:
-                if (is_label) {  /* fill label fields, if there is one */
+            case INSTRUCTION:  /* instruction = operation + operands */
+                /* fill label fields, if there is one */
+                if (is_label) {
                     set_label_fields(label, CODE, *IC);
                 }
                 is_label = FALSE;  /* reset label flag */
 
-                /* validate operands number */
-                if ((num_of_operands = get_num_of_operands(curr_line->line, line_number)) == OPERANDS_NUM_ERROR) {
+                /* get number of operands */
+                num_of_operands = get_num_of_operands(curr_line->line);
+                /* validate number of operands is correct */
+                if (!is_operands_num_valid(curr_line->line, num_of_operands)) {
+                    fprintf(stderr, "Error in line %d: invalid number of operands\n", line_number);
                     error_flag = TRUE;
                     break;
                 }
