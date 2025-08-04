@@ -475,7 +475,7 @@ int encode_mat_direc(char *line, MemoryUnit **table, int line_number) {
     char *line_arg, *line_copy, *mat_vals;
     /* words and args counter */
     int L = 0, arg_id = 0;
-    int val = MIN_10_BIT_VALUE, mat_size, mat_id; /* for matrix */
+    int val = MIN_10_BIT_VALUE, mat_size, mat_id = 0; /* for matrix */
 
     /* copy line for processing */
     line_copy = strdup(line);
@@ -492,9 +492,16 @@ int encode_mat_direc(char *line, MemoryUnit **table, int line_number) {
                 }
             }
 
+            /* too many values for matrix provided */
+            if (mat_id == mat_size) {
+                fprintf(stderr, "Error in line %d: too many values for matrix provided\n", line_number);
+                free(line_copy);
+                free(mat_vals);
+                return WORDS_NUM_ERROR;
+            }
+
             /* copy for matrix processing (avoids token override) */
             mat_vals = strdup(line);
-            /* go to matrix values (if provided) */
             mat_vals = strtok(NULL, OP_DELIMITERS);  /* skip directive name */
             mat_vals = strtok(NULL, OP_DELIMITERS);  /* skip matrix dimensions */
 

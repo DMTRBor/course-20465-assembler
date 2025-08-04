@@ -201,7 +201,7 @@ int is_expected_directive(char *direc, char *expected) {
 }
 
 
-int get_num_of_operands(char *line) {
+int get_num_of_arguments(char *line) {
     char *line_arg, *line_copy;
     int num_of_args = 0;
 
@@ -217,7 +217,7 @@ int get_num_of_operands(char *line) {
         line_arg = strtok(NULL, OP_DELIMITERS);
     }
 
-    /* discount operation name from count */
+    /* discount operation/directive name from count */
     num_of_args--;
 
     free(line_copy);

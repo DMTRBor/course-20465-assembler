@@ -11,7 +11,8 @@
 /* machine code type */
 enum SectionType {
     CODE,
-    DATA
+    DATA,
+    EXTERNAL
 };
 
 
@@ -33,8 +34,8 @@ typedef struct MemoryUnit {
 } MemoryUnit;
 
 
-#define IC_INITIAL_VALUE 100
-#define DC_INITIAL_VALUE 0
+#define EXTERN_LABEL_ADDRESS 0
+
 
 /* ----------- Memory Table Functions ----------- */
 MemoryUnit* new_mem_unit(void);
@@ -55,5 +56,6 @@ void set_label_fields(Label *, int, unsigned int);
 void free_labels_table(Label *);
 int add_label_to_table(Label **, Label *);
 int is_label_exists(Label **, Label *);
+void update_data_labels_address(Label **, int);
 
 #endif

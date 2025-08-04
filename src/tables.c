@@ -169,3 +169,15 @@ int is_label_exists(Label **head, Label *label) {
     
     return FALSE;  /* label not found */
 }
+
+
+void update_data_labels_address(Label **head, int ICF) {
+    Label *current = *head;
+
+    while (current != NULL) {
+        if (current->type == DATA)
+            current->address += ICF;
+
+        current = current->next;
+    }
+}

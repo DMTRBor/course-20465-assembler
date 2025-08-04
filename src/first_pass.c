@@ -5,10 +5,10 @@ int run_first_pass(char *filename, unsigned int *IC, unsigned int *DC,
                    MemoryUnit **mem, Label **labels) {
     int line_number = 1;
     int num_of_operands = 0;  /* number of operands for operation */
-    /* number of words occupied by the operation and the operands */
-    int L = 0;
+    int L = 0;  /* number of words occupied */
 
     int is_label = FALSE;  /* label flag */
+    int is_extern = FALSE;  /* external label flag */
 
     /* use error cheking for content of .am file */
     int error_flag = FALSE;
@@ -59,8 +59,13 @@ int run_first_pass(char *filename, unsigned int *IC, unsigned int *DC,
                     break;
                 }
                 
-                /* set new label name and cut from line */
-                label->name = get_label_name(&curr_line->line);
+                /* detect label type */
+                if (is_extern) {
+                    label->name = curr_line->line;  /* label coming from extern directive */
+                    set_label_fields(label, EXTERNAL, EXTERN_LABEL_ADDRESS);
+                }
+                else  /* set new label name */
+                    label->name = get_label_name(&curr_line->line);
 
                 /* check if label already exists */
                 if (is_label_exists(labels, label)) {
@@ -76,8 +81,14 @@ int run_first_pass(char *filename, unsigned int *IC, unsigned int *DC,
                     error_flag = TRUE;
                 }
 
-                is_label = TRUE;
-                continue;             /* process the remaining content in the line */
+                if (is_extern) {
+                    is_extern = FALSE;  /* reset external label flag */
+                    break;  /* go to next line */
+                }
+                else {
+                    is_label = TRUE;
+                    continue;  /* process the remaining content in the line */
+                }
 
             case DIRECTIVE:
                 if (is_label) {  /* fill label fields, if there is one */
@@ -85,10 +96,25 @@ int run_first_pass(char *filename, unsigned int *IC, unsigned int *DC,
                 }
                 is_label = FALSE;  /* reset label flag */
 
-                /* .entry/.extern will be completed in second pass */
-                if (is_expected_directive(curr_line->line, ENTRY_DIRECTIVE) ||
-                    is_expected_directive(curr_line->line, EXTERNAL_DIRECTIVE)) {
-                    break;
+                if (is_expected_directive(curr_line->line, ENTRY_DIRECTIVE)) {
+                    break;  /* .entry will be completed in second pass */
+                }
+                else if (is_expected_directive(curr_line->line, EXTERNAL_DIRECTIVE)) {
+                    if (get_num_of_arguments(curr_line->line) != NUM_OF_EXTERN_ARGS) {
+                        fprintf(stderr,
+                               "Error in line %d: external directive should have %d arguments\n",
+                               line_number, NUM_OF_EXTERN_ARGS);
+                        error_flag = TRUE;
+                        break;
+                    }
+                    is_extern = TRUE;  /* external label detected */
+                    /* skip directive name */
+                    curr_line->line += strlen(EXTERNAL_DIRECTIVE) + 1;
+                    /* skip possible whitespace */
+                    while (*curr_line->line && isspace((unsigned char)*curr_line->line))
+                        curr_line->line++;
+                    /* go to label */
+                    continue;
                 }
                 else if (is_expected_directive(curr_line->line, DATA_DIRECTIVE)) {
                     /* encode data with following args */
@@ -127,7 +153,7 @@ int run_first_pass(char *filename, unsigned int *IC, unsigned int *DC,
                 is_label = FALSE;  /* reset label flag */
 
                 /* get number of operands */
-                num_of_operands = get_num_of_operands(curr_line->line);
+                num_of_operands = get_num_of_arguments(curr_line->line);
                 /* validate number of operands is correct */
                 if (!is_operands_num_valid(curr_line->line, num_of_operands)) {
                     fprintf(stderr, "Error in line %d: invalid number of operands\n", line_number);
@@ -161,9 +187,10 @@ int run_first_pass(char *filename, unsigned int *IC, unsigned int *DC,
         free_list(curr_line);  /* free lines list */
         return STATUS_CODE_ERR;
     }
-    
-    /* free used memory */
-    free_list(curr_line);
 
+    /* separate data from code */
+    update_data_labels_address(labels, *IC);
+    
+    free_list(curr_line);  /* free lines list */
     return STATUS_CODE_OK;
 }

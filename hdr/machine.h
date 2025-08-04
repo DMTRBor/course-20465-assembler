@@ -86,4 +86,7 @@ extern ExpectedNumOfOperands expected_num_of_operands[];
 #define MAX_10_BIT_VALUE 511
 #define MIN_10_BIT_VALUE -512
 
+#define IC_RESET_VALUE 100
+#define DC_RESET_VALUE 0
+
 #endif

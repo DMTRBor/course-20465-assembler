@@ -12,9 +12,9 @@
 /* one last character is null terminator */
 #define MAX_FNAME_LEN 51
 #define MAX_LINE_LEN 81
-#define REG_NAME_LEN 2
 
 #define MIN_ALLOWED_ARGS 2
+#define NUM_OF_EXTERN_ARGS 1
 
 #define BASE_4 4
 #define BASE_10 10
@@ -58,8 +58,6 @@
 /* args and operators indices */
 #define FIRST_ARG_ID 1
 #define SEC_ARG_ID 2
-
-#define IC_DC_RESET_VALUE 0
 
 /* matrix encoding */
 #define MIN_MAT_SIZE 1
@@ -144,7 +142,7 @@ int is_directive(char *);
 int is_register(char *);
 int is_expected_directive(char *, char *);
 
-int get_num_of_operands(char *);
+int get_num_of_arguments(char *);
 LineArg get_operand_type(char *);
 AddrMethodCode get_operand_code_from_type(LineArg);
 

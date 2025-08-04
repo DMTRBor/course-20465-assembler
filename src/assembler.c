@@ -46,8 +46,8 @@ int main(int argc, char *argv[])
             /* first pass */
             fprintf(stdout, "Running first pass for: %s\n", filename);
             /* initialize IC and DC with reset value */
-            ic_value = IC_DC_RESET_VALUE;
-            dc_value = IC_DC_RESET_VALUE;
+            ic_value = IC_RESET_VALUE;
+            dc_value = DC_RESET_VALUE;
 
             MemoryUnit *mem = NULL;  /* memory map */
             Label *labels = NULL;  /* labels map */
