@@ -34,9 +34,6 @@ typedef struct MemoryUnit {
 } MemoryUnit;
 
 
-#define EXTERN_LABEL_ADDRESS 0
-
-
 /* ----------- Memory Table Functions ----------- */
 MemoryUnit* new_mem_unit(void);
 void set_mem_unit_type(MemoryUnit *, int);
