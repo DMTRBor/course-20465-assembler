@@ -7,6 +7,7 @@
 #include "../hdr/tables.h"
 #include "../hdr/encoding.h"
 
+
 /* relevant only for first pass */
 #define EXTERN_LABEL_ADDRESS 0
 

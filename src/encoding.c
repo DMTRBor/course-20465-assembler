@@ -119,6 +119,8 @@ int encode_directive_number(MemoryUnit **table, int number, int line_number, int
         return STATUS_CODE_ERR;  /* memory allocation failed */
     }
 
+    /* set memory unit type as "data" */
+    set_mem_unit_type(new, DATA);
     /* encode number value */
     encode_data_10_bit(&new->encoded_value, number);
     /* add new memory unit to table, increment words counter */

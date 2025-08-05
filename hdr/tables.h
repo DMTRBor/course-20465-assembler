@@ -8,6 +8,10 @@
 #include "../hdr/machine.h"
 
 
+/* invalid DCF value */
+#define INVALID_DCF 0
+
+
 /* machine code type */
 enum SectionType {
     CODE,
@@ -53,6 +57,6 @@ void set_label_fields(Label *, int, unsigned int);
 void free_labels_table(Label *);
 int add_label_to_table(Label **, Label *);
 int is_label_exists(Label **, Label *);
-void update_data_labels_address(Label **, int);
+unsigned int update_data_labels_address(Label **, int);
 
 #endif

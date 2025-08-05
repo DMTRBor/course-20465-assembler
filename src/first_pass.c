@@ -188,9 +188,13 @@ int run_first_pass(char *filename, unsigned int *IC, unsigned int *DC,
         return STATUS_CODE_ERR;
     }
 
-    /* separate data from code */
-    update_data_labels_address(labels, *IC);
-    
+    /* separate data from code, save DCF for second pass */
+    if ((*DC = update_data_labels_address(labels, *IC)) == INVALID_DCF) {
+        fprintf(stderr, "Error! failed to update data labels address\n");
+        free_list(curr_line);  /* free lines list */
+        return STATUS_CODE_ERR;
+    }
+
     free_list(curr_line);  /* free lines list */
     return STATUS_CODE_OK;
 }
