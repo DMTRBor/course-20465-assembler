@@ -19,19 +19,14 @@ MemoryUnit* new_mem_unit(void) {
 }
 
 
-void set_mem_unit_type(MemoryUnit *unit, int type) {
-    if (unit == NULL)
-        return;
+void set_mem_unit_addresses(MemoryUnit **head, unsigned int start_address) {
+    MemoryUnit *current = *head;
+    unsigned int current_address = start_address;
     
-    unit->type = type;
-}
-
-
-void set_mem_unit_addr(MemoryUnit *unit, unsigned int address) {
-    if (unit == NULL)
-        return;
-    
-    unit->address = address;
+    while (current != NULL) {
+        current->address = current_address++;
+        current = current->next;
+    }
 }
 
 

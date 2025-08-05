@@ -40,8 +40,7 @@ typedef struct MemoryUnit {
 
 /* ----------- Memory Table Functions ----------- */
 MemoryUnit* new_mem_unit(void);
-void set_mem_unit_type(MemoryUnit *, int);
-void set_mem_unit_addr(MemoryUnit *, unsigned int);
+void set_mem_unit_addresses(MemoryUnit **, unsigned int);
 void set_word_fields(MemoryUnit *,
                      unsigned int, 
                      unsigned int,

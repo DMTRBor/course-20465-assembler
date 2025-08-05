@@ -195,6 +195,9 @@ int run_first_pass(char *filename, unsigned int *IC, unsigned int *DC,
         return STATUS_CODE_ERR;
     }
 
+    /* update memory addresses for all units */
+    set_mem_unit_addresses(mem, IC_RESET_VALUE);
+
     free_list(curr_line);  /* free lines list */
     return STATUS_CODE_OK;
 }
