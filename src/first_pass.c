@@ -68,7 +68,7 @@ int run_first_pass(char *filename, unsigned int *IC, unsigned int *DC,
                     label->name = get_label_name(&curr_line->line);
 
                 /* check if label already exists */
-                if (is_label_exists(labels, label)) {
+                if (is_label_exists(labels, label->name)) {
                     fprintf(stderr, "Label '%s' from line %d already exists\n", label->name, line_number);
                     free(label);
                     error_flag = TRUE;

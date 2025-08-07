@@ -16,7 +16,8 @@
 enum SectionType {
     CODE,
     DATA,
-    EXTERNAL
+    EXTERNAL,
+    ENTRY
 };
 
 
@@ -53,9 +54,10 @@ void add_unit_and_increment_L(MemoryUnit **, MemoryUnit *, int *);
 /* ----------- Labels Table Functions ----------- */
 Label* new_label(void);
 void set_label_fields(Label *, int, unsigned int);
+void set_label_type(Label **, char *, unsigned int);
 void free_labels_table(Label *);
 int add_label_to_table(Label **, Label *);
-int is_label_exists(Label **, Label *);
+int is_label_exists(Label **, char *);
 unsigned int update_data_labels_address(Label **, int);
 
 #endif

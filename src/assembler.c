@@ -1,5 +1,6 @@
 #include "../hdr/pre_assembler.h"
 #include "../hdr/first_pass.h"
+#include "../hdr/second_pass.h"
 
 
 /**
@@ -55,7 +56,7 @@ int main(int argc, char *argv[])
             if (run_first_pass(argv[arg_id], &ic_value, &dc_value, &mem, &labels) == STATUS_CODE_OK) {
                 fprintf(stdout, "Running second pass for: %s\n", filename);
                 /* second pass - using final IC and DC values */
-                /* run_second_pass(argv[arg_id], &ic_value, &dc_value); */
+                run_second_pass(argv[arg_id], &ic_value, &dc_value, &mem, &labels);
             }
             
             /* clean used memory, if allocated */

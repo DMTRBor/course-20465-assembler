@@ -19,8 +19,8 @@ MemoryUnit* new_mem_unit(void) {
 }
 
 
-void set_mem_unit_addresses(MemoryUnit **head, unsigned int start_address) {
-    MemoryUnit *current = *head;
+void set_mem_unit_addresses(MemoryUnit **table, unsigned int start_address) {
+    MemoryUnit *current = *table;
     unsigned int current_address = start_address;
     
     while (current != NULL) {
@@ -45,16 +45,16 @@ void set_word_fields(MemoryUnit *unit,
 }
 
 
-void add_mem_unit_to_table(MemoryUnit **head, MemoryUnit *new) {
+void add_mem_unit_to_table(MemoryUnit **table, MemoryUnit *new) {
     MemoryUnit *current;
     
-    if (head == NULL || new == NULL)
+    if (table == NULL || new == NULL)
         return;
-    
-    if (*head == NULL)
-        *head = new;
+
+    if (*table == NULL)
+        *table = new;
     else {
-        current = *head;
+        current = *table;
 
         while (current->next != NULL)
             current = current->next;
@@ -64,8 +64,8 @@ void add_mem_unit_to_table(MemoryUnit **head, MemoryUnit *new) {
 }
 
 
-void free_mem_table(MemoryUnit *head) {
-    MemoryUnit *current = head;
+void free_mem_table(MemoryUnit *table) {
+    MemoryUnit *current = table;
     MemoryUnit *next;
     
     while (current != NULL) {
@@ -110,8 +110,26 @@ void set_label_fields(Label *label, int type, unsigned int address) {
 }
 
 
-void free_labels_table(Label *head) {
-    Label *current = head;
+void set_label_type(Label **table, char *label_name, unsigned int label_type) {
+    Label *current;
+    
+    if (table == NULL || *table == NULL || label_name == NULL)
+        return;
+
+    current = *table;
+    /* search for label by name */
+    while (current != NULL) {
+        if (strcmp(current->name, label_name) == STR_EQUAL) {
+            current->type = label_type;  /* update label type */
+            return;
+        }
+        current = current->next;
+    }
+}
+
+
+void free_labels_table(Label *table) {
+    Label *current = table;
     Label *next;
     
     while (current != NULL) {
@@ -126,16 +144,16 @@ void free_labels_table(Label *head) {
 }
 
 
-int add_label_to_table(Label **head, Label *new_label) {
+int add_label_to_table(Label **table, Label *new_label) {
     Label *current;
     
-    if (head == NULL || new_label == NULL)
+    if (table == NULL || new_label == NULL)
         return STATUS_CODE_ERR;
 
-    if (*head == NULL)
-        *head = new_label;
+    if (*table == NULL)
+        *table = new_label;
     else {
-        current = *head;
+        current = *table;
 
         while (current->next != NULL)
             current = current->next;
@@ -147,18 +165,19 @@ int add_label_to_table(Label **head, Label *new_label) {
 }
 
 
-int is_label_exists(Label **head, Label *label) {
+int is_label_exists(Label **table, char *label_name) {
     Label *current;
     
-    if (head == NULL || *head == NULL || label == NULL)
+    /* check if labels table in not empty and label name is valid */
+    if (table == NULL || *table == NULL || label_name == NULL)
         return FALSE;
-    
-    current = *head;
+
+    current = *table;
     /* search in labels table */
     while (current != NULL) {
-        if (strcmp(current->name, label->name) == STR_EQUAL) {
+        if (strcmp(current->name, label_name) == STR_EQUAL)
             return TRUE;  /* label exists */
-        }
+        /* go to next label */
         current = current->next;
     }
     
@@ -166,8 +185,8 @@ int is_label_exists(Label **head, Label *label) {
 }
 
 
-unsigned int update_data_labels_address(Label **head, int ICF) {
-    Label *current = *head;
+unsigned int update_data_labels_address(Label **table, int ICF) {
+    Label *current = *table;
     unsigned int DCF = INVALID_DCF;  /* data final counter */
 
     while (current != NULL) {
