@@ -1,4 +1,4 @@
-#include "../hdr/passes.h"
+#include "../hdr/second_pass.h"
 
 
 int run_second_pass(char *filename, unsigned int *IC, unsigned int *DC,
@@ -98,11 +98,14 @@ int run_second_pass(char *filename, unsigned int *IC, unsigned int *DC,
 
     /* build output files */
     /* object file */
-    /* build_object_file(filename, IC, DC, mem, labels); */
+    build_object_file(filename, *IC, *DC, mem, labels);
     /* ext file */
-    /* build_ext_file(filename, labels); */
+    build_ext_file(filename, labels);
     /* entry file */
-    /* build_entry_file(filename, labels); */
+    if (build_ent_file(filename, labels) != STATUS_CODE_OK) {
+        free_list(curr_line);  /* failed - free lines list */
+        return STATUS_CODE_ERR;
+    }
 
     free_list(curr_line);  /* free lines list */
     return STATUS_CODE_OK;

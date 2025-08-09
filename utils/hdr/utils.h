@@ -16,7 +16,6 @@
 #define MIN_ALLOWED_ARGS 2
 #define NUM_OF_EXTERN_ARGS 1
 
-#define BASE_4 4
 #define BASE_10 10
 
 #define STR_EQUAL 0
@@ -25,10 +24,8 @@
 #define MACRO_START "mcro"
 #define MACRO_END "mcroend"
 #define LABEL_END_SIGN ':'
-#define DIRECTIVE_SIGN "."
 #define QUOTATION_MARK '"'
 #define IMMEDIATE_ADDR_SIGN '#'
-#define REGISTER_PREFIX "r"
 #define MAT_LEFT_BRACE '['
 #define MAT_RIGHT_BRACE ']'
 #define COMMENT_SIGN ';'
@@ -41,8 +38,6 @@
 #define NEWLINE_CHAR '\n'
 #define NULL_TERMINATOR '\0'
 #define UNDERSCORE '_'
-#define COMMA ','
-#define ZERO '0'
 
 /* file permissions */
 #define READ_FILE_PERMISSION "r"
@@ -63,16 +58,6 @@
 #define MIN_MAT_SIZE 1
 #define MAX_MAT_SIZE 15
 #define ILLEGAL_MAT_SIZE 0
-
-/* max for 255 max value */
-#define MAX_DIGITS_BASE_4 5
-
-/* directives */
-#define DATA_DIRECTIVE ".data"
-#define STRING_DIRECTIVE ".string"
-#define MAT_DIRECTIVE ".mat"
-#define ENTRY_DIRECTIVE ".entry"
-#define EXTERNAL_DIRECTIVE ".extern"
 
 
 /* status codes */
@@ -101,16 +86,6 @@ typedef enum {
     MATRIX_ADDR,
     ERROR
 } LineArg;
-
-
-/**
- * This function receives a decimal number string
- * representation and an empty string, converts the
- * decimal number to base 4 representation
- * and places the converted string representation of
- * the number in base 4 in an empty string.
- */
-void decimal_to_base4(char *, char *);
 
 /**
  * This function receives a data

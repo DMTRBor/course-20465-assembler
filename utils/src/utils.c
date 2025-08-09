@@ -1,39 +1,6 @@
 #include "../hdr/utils.h"
 
 
-void decimal_to_base4(char *decimal, char *converted) {
-    /* temporary converted number storage */
-    char temp[MAX_DIGITS_BASE_4 + 1];  /* +1 for null terminator */
-    int decimal_num = 0;
-    int power = 2;  /* hundreds */
-    int i = 0, j;
-
-    /* skip first zero, address starts from 100 */
-    decimal++;
-    
-    /* convert string to integer */
-    while (*decimal != NULL_TERMINATOR) {
-        decimal_num += (*decimal - ZERO) * pow(BASE_10, power);
-        decimal++;
-        power--;
-    }
-    
-    /* store reversed conversion of decimal to base 4 */
-    while (decimal_num > 0) {
-        temp[i++] = (decimal_num % BASE_4) + ZERO;
-        decimal_num /= BASE_4;
-    }
-    temp[i] = NULL_TERMINATOR;
-    
-    /* revert the number in base 4, skip null terminator */
-    for (j = i - 1; j >= 0; j--) {
-        *converted = temp[j];
-        converted++;
-    }
-    *converted = NULL_TERMINATOR;
-}
-
-
 long file_content_size(FILE* fp) {
     long content_size;
 

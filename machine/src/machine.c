@@ -85,3 +85,7 @@ ExpectedNumOfOperands expected_num_of_operands[] = {
     { &operations[14], NO_OPERANDS },      /* rts */
     { &operations[15], NO_OPERANDS }       /* stop */
 };
+
+
+/* base-4 to letters mapping */
+const char base4_encoded[] = {'a', 'b', 'c', 'd'};

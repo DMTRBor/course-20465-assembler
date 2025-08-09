@@ -8,11 +8,11 @@
 #include "../../encoding/hdr/data_section.h"
 
 
-#define EXTERN_LABEL_ADDRESS 0
-#define WHITESPACE_CHAR ' '
-
-
-int run_first_pass(char *, unsigned int *, unsigned int *, MemoryUnit **, Label **);
-int run_second_pass(char *, unsigned int *, unsigned int *, MemoryUnit **, Label **);
+/* directives */
+#define DATA_DIRECTIVE ".data"
+#define STRING_DIRECTIVE ".string"
+#define MAT_DIRECTIVE ".mat"
+#define ENTRY_DIRECTIVE ".entry"
+#define EXTERNAL_DIRECTIVE ".extern"
 
 #endif

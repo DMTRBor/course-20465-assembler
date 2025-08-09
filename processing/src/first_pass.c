@@ -1,4 +1,4 @@
-#include "../hdr/passes.h"
+#include "../hdr/first_pass.h"
 
 
 int run_first_pass(char *filename, unsigned int *IC, unsigned int *DC,

@@ -1,5 +1,6 @@
 #include "processing/hdr/pre_assembler.h"
-#include "processing/hdr/passes.h"
+#include "processing/hdr/first_pass.h"
+#include "processing/hdr/second_pass.h"
 
 
 /**

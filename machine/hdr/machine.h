@@ -75,7 +75,7 @@ extern const char *directives[];
 extern const char *registers[];
 extern LegalAddrMethods legal_addressing_methods[];
 extern ExpectedNumOfOperands expected_num_of_operands[];
-
+extern const char base4_encoded[];
 
 #define MEMORY_SIZE 256
 #define MIN_INTEGER -128

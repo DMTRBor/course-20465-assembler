@@ -12,7 +12,7 @@
 #define NUM_OF_MCRO_ARGS 2
 #define NUM_OF_MCROEND_ARGS 1
 
-
+/* forward declarations */
 int run_pre_assembler(FILE *, char *);
 
 #endif
