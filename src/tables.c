@@ -10,7 +10,7 @@ MemoryUnit* new_mem_unit(void) {
         return NULL;
     
     /* initialize fields with default values */
-    new_unit->type = CODE;
+    new_unit->label_op_name = NULL;
     new_unit->address = 0;
     memset(&new_unit->encoded_value, 0, sizeof(Word));  /* reset word fields */
     new_unit->next = NULL;

@@ -119,14 +119,46 @@ int encode_directive_number(MemoryUnit **table, int number, int line_number, int
         return STATUS_CODE_ERR;  /* memory allocation failed */
     }
 
-    /* set memory unit type as "data" */
-    new->type = DATA;
     /* encode number value */
     encode_data_10_bit(&new->encoded_value, number);
     /* add new memory unit to table, increment words counter */
     add_unit_and_increment_L(table, new, L);
 
     return STATUS_CODE_OK;
+}
+
+
+int encode_labels_addresses(MemoryUnit **mem, Label **labels) {
+    MemoryUnit *mem_unit = *mem;
+    Label *label;
+
+    while (mem_unit != NULL) {
+        if (mem_unit->label_op_name != NULL) {  /* label found */
+            label = *labels;
+            /* search for label in labels table */
+            while (label != NULL) {
+                if (strcmp(mem_unit->label_op_name, label->name) == STR_EQUAL) {  /* label found */
+                    /* check if external label */
+                    if (label->type == EXTERNAL)
+                        mem_unit->encoded_value.encoding_type = E;  /* external label */
+
+                    /* encode address */
+                    encode_operand_8_bit(&mem_unit->encoded_value, label->address);
+                    break;  /* stop label search */
+                }
+                label = label->next;
+            }
+
+            if (label == NULL) {  /* label not found in whole table */
+                fprintf(stderr, "Error: label '%s' not found in labels table\n",
+                        mem_unit->label_op_name);
+                return STATUS_CODE_ERR;
+            }
+        }
+        mem_unit = mem_unit->next;
+    }
+
+    return STATUS_CODE_OK;  /* encoding labels addresses succeeded */
 }
 
 
@@ -198,11 +230,13 @@ int encode_operand_by_type(char *operand, int is_src, unsigned int operand_type,
                                 (int)strtol(operand + 1, NULL, BASE_10));
             break;
         case DIRECT:
-            /* no encoding at first pass - label */
+            /* no encoding at first pass - store label name */
+            new->label_op_name = strdup(operand);
             new->encoded_value.encoding_type = R;
             break;
         case MAT:
-            /* no encoding at first pass - label */
+            /* no encoding at first pass - store label name */
+            store_matrix_name(operand, &new->label_op_name);
             new->encoded_value.encoding_type = R;
             add_unit_and_increment_L(table, new, L);
 

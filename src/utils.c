@@ -377,3 +377,20 @@ int get_mat_size(char *mat_size_str) {
     free(size_copy);
     return size;  /* return matrix dimensions */
 }
+
+
+void store_matrix_name(char *operand, char **mem_mat_name) {
+    size_t mat_name_len;
+
+    /* calculate matrix name length */
+    mat_name_len = strchr(operand, MAT_LEFT_BRACE) - operand;
+
+    /* allocate buffer for mat name in memory unit */
+    if ((*mem_mat_name = (char *)malloc(mat_name_len + 1)) == NULL) {
+        fprintf(stderr, "Error allocating memory for matrix name\n");
+        return;
+    }
+    /* store matrix name in memory unit */
+    strncpy(*mem_mat_name, operand, mat_name_len);
+    (*mem_mat_name)[mat_name_len] = NULL_TERMINATOR;
+}

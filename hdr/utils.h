@@ -154,4 +154,6 @@ int to_int(char *, int *, int);
 
 int get_mat_size(char *);
 
+void store_matrix_name(char *, char **);
+
 #endif

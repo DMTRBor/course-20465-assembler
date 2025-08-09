@@ -3,7 +3,7 @@
 
 #include "../hdr/data_struct.h"
 #include "../hdr/tables.h"
-#include "../hdr/errors_handling.h"
+#include "../hdr/encoding.h"
 
 
 #define WHITESPACE_CHAR ' '

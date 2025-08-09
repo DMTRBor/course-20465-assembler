@@ -32,7 +32,7 @@ typedef struct Label {
 
 /* memory map unit */
 typedef struct MemoryUnit {
-    int type;  /* CODE or DATA */
+    char *label_op_name;  /* optional - to store label operand */
     unsigned int address;
     Word encoded_value;
     struct MemoryUnit *next;

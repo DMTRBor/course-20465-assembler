@@ -35,6 +35,7 @@ int run_second_pass(char *filename, unsigned int *IC, unsigned int *DC,
         line_arg_type = detect_and_validate_first_arg(curr_line->line, line_number);
 
         switch (line_arg_type) {
+            case INSTRUCTION:  /* will be completed later */
             case EMPTY_LINE:
             case COMMENT:
                 break;  /* ignore these lines */
@@ -72,9 +73,6 @@ int run_second_pass(char *filename, unsigned int *IC, unsigned int *DC,
                 /* skip data, string, mat and extern */
                 break;
 
-            case INSTRUCTION:
-                break;
-
             default:
                 fprintf(stderr, "Argument error in line %d: unrecognized argument - %s\n",
                         line_number, curr_line->line);
@@ -92,7 +90,14 @@ int run_second_pass(char *filename, unsigned int *IC, unsigned int *DC,
         return STATUS_CODE_ERR;
     }
 
+    /* encode labels */
+    if (encode_labels_addresses(mem, labels) != STATUS_CODE_OK) {
+        free_list(curr_line);  /* failed - free lines list */
+        return STATUS_CODE_ERR;
+    }
+
     /* build output files */
+    
 
     free_list(curr_line);  /* free lines list */
     return STATUS_CODE_OK;
