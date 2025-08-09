@@ -97,7 +97,12 @@ int run_second_pass(char *filename, unsigned int *IC, unsigned int *DC,
     }
 
     /* build output files */
-    
+    /* object file */
+    // build_object_file(filename, IC, DC, mem, labels);
+    /* ext file */
+    // build_ext_file(filename, labels);
+    /* entry file */
+    // build_entry_file(filename, labels);
 
     free_list(curr_line);  /* free lines list */
     return STATUS_CODE_OK;
