@@ -17,7 +17,7 @@ int run_pre_assembler(FILE *fp, char *filename) {
     Macro *macros[MAX_MACROS_ALLOWED] = { NULL };  /* array of macro lists */
 
     /* create file lines structured list */
-    curr_line = file_to_list(fp);
+    curr_line = file_to_lines_list(fp);
     /* point to first line in file */
     first_line = curr_line;
     /* error - line too long/memory misallocation */
@@ -41,7 +41,7 @@ int run_pre_assembler(FILE *fp, char *filename) {
                 /* check if macro name is valid */
                 /* check if macro header contains extraneous args */
                 if (!is_macro_name_valid(curr_line->line, line_number) || !is_macro_args_num_valid(curr_line->line, NUM_OF_MCRO_ARGS)) {
-                    free_list(first_line);
+                    free_lines_list(first_line);
                     free_macro(macro_curr_line);
                     return STATUS_CODE_ERR;
                 }
@@ -57,7 +57,7 @@ int run_pre_assembler(FILE *fp, char *filename) {
             case MCROEND:
                 /* check if macro end contains extraneous args */
                 if (!is_macro_args_num_valid(curr_line->line, NUM_OF_MCROEND_ARGS)) {
-                    free_list(first_line);
+                    free_lines_list(first_line);
                     free_macro(macro_curr_line);
                     return STATUS_CODE_ERR;
                 }
@@ -92,19 +92,19 @@ int run_pre_assembler(FILE *fp, char *filename) {
 
     /* add macro-parsed file extension */
     strcpy(macro_filename, filename);
-    strcat(macro_filename, ASMB_MCRO_FILE_EXTEN);
+    strcat(macro_filename, ASMB_MACRO_FILE_EXTEN);
 
     /* write list to file after macros expansion */
     if ((fp = open_file(macro_filename, WRITE_FILE_PERMISSION)) == NULL)
         return STATUS_CODE_ERR;
 
-    if (list_to_file(first_line, fp) == STATUS_CODE_ERR) {
+    if (lines_list_to_file(first_line, fp) == STATUS_CODE_ERR) {
         fclose(fp);
         return STATUS_CODE_ERR;
     }
 
     /* free used memory */
-    free_list(first_line);
+    free_lines_list(first_line);
     /* close file */
     fclose(fp);
 

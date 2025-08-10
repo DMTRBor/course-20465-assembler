@@ -5,10 +5,6 @@
 #include "../../utils/hdr/utils.h"
 
 
-/* invalid DCF value */
-#define INVALID_DCF 0
-
-
 /* labels map unit */
 typedef struct Label {
     int type;  /* CODE or DATA */
@@ -25,6 +21,6 @@ void set_label_type(Label **, char *, unsigned int);
 void free_labels_table(Label *);
 int add_label_to_table(Label **, Label *);
 int is_label_exists(Label **, char *);
-unsigned int update_data_labels_address(Label **, int);
+void update_data_labels_address(Label **, int);
 
 #endif

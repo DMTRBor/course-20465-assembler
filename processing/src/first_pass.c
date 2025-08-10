@@ -22,7 +22,7 @@ int run_first_pass(char *filename, unsigned int *IC, unsigned int *DC,
 
     /* add macro-parsed file extension */
     strcpy(am_filename, filename);
-    strcat(am_filename, ASMB_MCRO_FILE_EXTEN);
+    strcat(am_filename, ASMB_MACRO_FILE_EXTEN);
 
     /* open *.am file for reading */
     if ((fp = open_file(am_filename, READ_FILE_PERMISSION)) == NULL)
@@ -30,7 +30,7 @@ int run_first_pass(char *filename, unsigned int *IC, unsigned int *DC,
 
     /* create file lines structured list */
     /* point to first line */
-    if ((curr_line = file_to_list(fp)) == NULL) {  /* memory misallocation */
+    if ((curr_line = file_to_lines_list(fp)) == NULL) {  /* memory misallocation */
         fclose(fp);
         return STATUS_CODE_ERR;
     }
@@ -184,20 +184,15 @@ int run_first_pass(char *filename, unsigned int *IC, unsigned int *DC,
 
     /* errors found in file */
     if (error_flag) {
-        free_list(curr_line);  /* free lines list */
+        free_lines_list(curr_line);  /* free lines list */
         return STATUS_CODE_ERR;
     }
 
-    /* separate data from code, save DCF for second pass */
-    if ((*DC = update_data_labels_address(labels, *IC)) == INVALID_DCF) {
-        fprintf(stderr, "Error! failed to update data labels address\n");
-        free_list(curr_line);  /* free lines list */
-        return STATUS_CODE_ERR;
-    }
-
+    /* separate data from code */
+    update_data_labels_address(labels, *IC);
     /* update memory addresses for all units */
     set_mem_unit_addresses(mem_map, IC_RESET_VALUE);
 
-    free_list(curr_line);  /* free lines list */
+    free_lines_list(curr_line);  /* free lines list */
     return STATUS_CODE_OK;
 }

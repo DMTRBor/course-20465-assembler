@@ -102,18 +102,14 @@ int is_label_exists(Label **table, char *label_name) {
 }
 
 
-unsigned int update_data_labels_address(Label **table, int ICF) {
+void update_data_labels_address(Label **table, int ICF) {
     Label *current = *table;
-    unsigned int DCF = INVALID_DCF;  /* data final counter */
 
     while (current != NULL) {
         if (current->type == DATA) {  /* detected data label */
-            current->address += ICF;
-            DCF = current->address;  /* update data final counter */
+            current->address += ICF;  /* add ICF to data label address */
         }
 
         current = current->next;
     }
-
-    return DCF;  /* return DCF */
 }

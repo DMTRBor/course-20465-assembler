@@ -13,18 +13,18 @@ Line* new_line(char *line) {
 }
 
 
-void delete_line_from_list(Line *curr) {
+void delete_line_from_list(Line *curr_line) {
     Line *temp = NULL;
     /* last line will not be deleted */
-    if (curr == NULL || curr->next == NULL)
+    if (curr_line == NULL || curr_line->next == NULL)
         return;
 
-    temp = curr->next;
+    temp = curr_line->next;
 
     /* copy next line's data into current ptr */
-    free(curr->line);
-    curr->line = strdup(temp->line);
-    curr->next = temp->next;
+    free(curr_line->line);
+    curr_line->line = strdup(temp->line);
+    curr_line->next = temp->next;
 
     /* free redundant next line */
     free(temp->line);
@@ -32,19 +32,19 @@ void delete_line_from_list(Line *curr) {
 }
 
 
-void free_list(Line *curr) {
+void free_lines_list(Line *list) {
     Line *temp = NULL;
 
-    while (curr != NULL) {
-        temp = curr;
-        curr = curr->next;
-        free(temp->line);
+    while (list != NULL) {
+        temp = list;  /* store current line */
+        list = list->next;
+        free(temp->line);  /* delete line */
         free(temp);
     }
 }
 
 
-Line* file_to_list(FILE *fp) {
+Line* file_to_lines_list(FILE *fp) {
     Line *start = NULL, *end = NULL, *new = NULL;
     char line[MAX_LINE_LEN];
 
@@ -71,20 +71,20 @@ Line* file_to_list(FILE *fp) {
 }
 
 
-int list_to_file(Line *curr, FILE *fp) {
+int lines_list_to_file(Line *list, FILE *fp) {
     int line_number = 1;  /* initialize line number */
     
     if (fp == NULL)
         return STATUS_CODE_ERR;
 
-    while (curr != NULL) {
+    while (list != NULL) {
         /* write line to file stream */
         /* negative value indicates writing failed */
-        if (fprintf(fp, "%s\n", curr->line) < 0) {
+        if (fprintf(fp, "%s\n", list->line) < MIN_CHARS_WRITTEN) {
             fprintf(stderr, "Error writing to file at line %d\n", line_number);
             return STATUS_CODE_ERR;
         }
-        curr = curr->next;
+        list = list->next;
         line_number++;
     }
 

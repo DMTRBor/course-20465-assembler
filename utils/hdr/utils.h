@@ -43,9 +43,13 @@
 #define READ_FILE_PERMISSION "r"
 #define WRITE_FILE_PERMISSION "w"
 
+/* minimum possible number of
+   characters written to file */
+#define MIN_CHARS_WRITTEN 0
+
 /* file extensions */
 #define ASMB_FILE_EXTEN ".as"
-#define ASMB_MCRO_FILE_EXTEN ".am"
+#define ASMB_MACRO_FILE_EXTEN ".am"
 #define OBJECT_FILE_EXTEN ".ob"
 #define EXTERNAL_FILE_EXTEN ".ext"
 #define ENTRIES_FILE_EXTEN ".ent"

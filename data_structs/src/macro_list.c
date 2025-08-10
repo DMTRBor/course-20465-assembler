@@ -1,20 +1,20 @@
 #include "../hdr/macro.h"
 
 
-Macro* init_macro_list(char *mcro_name) {
-    Macro *mcro = malloc(sizeof(Macro));
+Macro* init_macro_list(char *macro_name) {
+    Macro *macro = malloc(sizeof(Macro));
     /* check if allocated properly */
-    if (mcro == NULL)
+    if (macro == NULL)
         return NULL;
 
-    mcro->name = strdup(mcro_name);
-    mcro->line = NULL;
+    macro->name = strdup(macro_name);
+    macro->line = NULL;
 
-    return mcro;
+    return macro;
 }
 
 
-void add_line_to_macro(Macro *mcro, Line *line) {
+void add_line_to_macro(Macro *macro, Line *line) {
     Line *curr = NULL;
     /* allocate line for copy */
     Line *new_line = malloc(sizeof(Line));
@@ -27,11 +27,11 @@ void add_line_to_macro(Macro *mcro, Line *line) {
     new_line->next = NULL;
 
     /* add line to macro list */
-    if (mcro->line == NULL)
-        mcro->line = new_line;
+    if (macro->line == NULL)
+        macro->line = new_line;
     else {
         /* traverse to the end and append */
-        curr = mcro->line;
+        curr = macro->line;
 
         while (curr->next != NULL) {
             curr = curr->next;
@@ -106,8 +106,8 @@ void insert_macro_in_list(Line *line, Macro *macro) {
 }
 
 
-void free_macro(Macro *mcro) {
-    Line *curr = mcro->line;
+void free_macro(Macro *macro) {
+    Line *curr = macro->line;
     Line *temp = NULL;
 
     while (curr != NULL) {
@@ -117,6 +117,6 @@ void free_macro(Macro *mcro) {
         free(temp);
     }
 
-    free(mcro->name);
-    free(mcro);
+    free(macro->name);
+    free(macro);
 }

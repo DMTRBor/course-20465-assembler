@@ -14,8 +14,8 @@ typedef struct Line {
 /* forward declarations */
 Line* new_line(char *);
 void delete_line_from_list(Line *);
-void free_list(Line *);
-Line* file_to_list(FILE *);
-int list_to_file(Line *, FILE *);
+void free_lines_list(Line *);
+Line* file_to_lines_list(FILE *);
+int lines_list_to_file(Line *, FILE *);
 
 #endif

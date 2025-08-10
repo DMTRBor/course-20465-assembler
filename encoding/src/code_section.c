@@ -121,7 +121,7 @@ int encode_operand_by_type(char *operand, int is_src, unsigned int operand_type,
 }
 
 
-int encode_operands(MemoryUnit **table, char *op_line,
+int encode_operands(MemoryUnit **mem_map, char *op_line,
                     unsigned int dest_operand, unsigned int src_operand,
                     int line_number, int *L, int num_of_operands) {
     char *line_arg, *line_copy, *dest_arg;
@@ -141,7 +141,7 @@ int encode_operands(MemoryUnit **table, char *op_line,
     /* source and destination */
     if (num_of_operands == SRC_AND_DEST) {
         if (src_operand == REG && dest_operand == REG) {  /* both operands are registers */
-            if (encode_both_registers(table, line_arg, line_number, L) == STATUS_CODE_ERR) {
+            if (encode_both_registers(mem_map, line_arg, line_number, L) == STATUS_CODE_ERR) {
                 free(line_copy);
                 return STATUS_CODE_ERR;
             }
@@ -152,13 +152,13 @@ int encode_operands(MemoryUnit **table, char *op_line,
             dest_arg = strtok(NULL, OP_DELIMITERS);
             
             /* encode source operand */
-            if (encode_operand_by_type(line_arg, TRUE, src_operand, line_number, L, table) == STATUS_CODE_ERR) {
+            if (encode_operand_by_type(line_arg, TRUE, src_operand, line_number, L, mem_map) == STATUS_CODE_ERR) {
                 free(line_copy);
                 return STATUS_CODE_ERR;  /* encoding failed */
             }
             
             /* encode destination operand */
-            if (encode_operand_by_type(dest_arg, FALSE, dest_operand, line_number, L, table) == STATUS_CODE_ERR) {
+            if (encode_operand_by_type(dest_arg, FALSE, dest_operand, line_number, L, mem_map) == STATUS_CODE_ERR) {
                 free(line_copy);
                 return STATUS_CODE_ERR;  /* encoding failed */
             }
@@ -166,7 +166,7 @@ int encode_operands(MemoryUnit **table, char *op_line,
     }
     /* destination only */
     else {  /* encode destination operand */
-        if (encode_operand_by_type(line_arg, FALSE, dest_operand, line_number, L, table) == STATUS_CODE_ERR) {
+        if (encode_operand_by_type(line_arg, FALSE, dest_operand, line_number, L, mem_map) == STATUS_CODE_ERR) {
             free(line_copy);
             return STATUS_CODE_ERR;  /* encoding failed */
         }

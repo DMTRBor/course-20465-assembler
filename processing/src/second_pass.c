@@ -1,7 +1,7 @@
 #include "../hdr/second_pass.h"
 
 
-int run_second_pass(char *filename, unsigned int *IC, unsigned int *DC,
+int run_second_pass(char *filename, unsigned int *ICF, unsigned int *DCF,
                     MemoryUnit **mem_map, Label **labels) {
     int line_number = 1;
 
@@ -20,7 +20,7 @@ int run_second_pass(char *filename, unsigned int *IC, unsigned int *DC,
 
     /* add macro-parsed file extension */
     strcpy(am_filename, filename);
-    strcat(am_filename, ASMB_MCRO_FILE_EXTEN);
+    strcat(am_filename, ASMB_MACRO_FILE_EXTEN);
 
     /* open *.am file for reading */
     if ((fp = open_file(am_filename, READ_FILE_PERMISSION)) == NULL)
@@ -28,7 +28,7 @@ int run_second_pass(char *filename, unsigned int *IC, unsigned int *DC,
 
     /* create file lines structured list */
     /* point to first line */
-    if ((curr_line = file_to_list(fp)) == NULL) {  /* memory misallocation */
+    if ((curr_line = file_to_lines_list(fp)) == NULL) {  /* memory misallocation */
         fclose(fp);
         return STATUS_CODE_ERR;
     }
@@ -92,30 +92,33 @@ int run_second_pass(char *filename, unsigned int *IC, unsigned int *DC,
 
     /* errors found in file */
     if (error_flag) {
-        free_list(curr_line);  /* free lines list */
+        free_lines_list(curr_line);  /* free lines list */
         return STATUS_CODE_ERR;
     }
 
     /* encode labels in memory table */
-    if (encode_labels_addresses(mem_map, labels) != STATUS_CODE_OK) {
-        free_list(curr_line);  /* failed - free lines list */
+    if (encode_labels_addresses(mem_map, labels) == STATUS_CODE_ERR) {
+        free_lines_list(curr_line);  /* failed - free lines list */
         return STATUS_CODE_ERR;
     }
 
     /* build output files */
     /* object file */
-    build_object_file(filename, *IC, *DC, mem_map, labels);
+    if (build_object_file(filename, *ICF, *DCF, mem_map) == STATUS_CODE_ERR) {
+        free_lines_list(curr_line);  /* failed - free lines list */
+        return STATUS_CODE_ERR;
+    }
     /* ext file - create only if extern labels exist */
-    if (has_externs && (build_ext_file(filename, mem_map) != STATUS_CODE_OK)) {
-        free_list(curr_line);  /* failed - free lines list */
+    if (has_externs && (build_ext_file(filename, mem_map) == STATUS_CODE_ERR)) {
+        free_lines_list(curr_line);  /* failed - free lines list */
         return STATUS_CODE_ERR;
     }
     /* entry file - create only if entry labels exist */
-    if (has_entries && (build_ent_file(filename, labels) != STATUS_CODE_OK)) {
-        free_list(curr_line);  /* failed - free lines list */
+    if (has_entries && (build_ent_file(filename, labels) == STATUS_CODE_ERR)) {
+        free_lines_list(curr_line);  /* failed - free lines list */
         return STATUS_CODE_ERR;
     }
 
-    free_list(curr_line);  /* free lines list */
+    free_lines_list(curr_line);  /* free lines list */
     return STATUS_CODE_OK;
 }

@@ -15,7 +15,6 @@
 
 /* file buffer max characters (already includes null terminator) */
 #define MAX_FILE_BUFFER (MAX_LINE_LEN * MEMORY_SIZE)
-#define MIN_CHARS_WRITTEN 0
 
 
 /**
@@ -27,9 +26,19 @@
  */
 void decimal_to_base4(unsigned int, char *);
 
-int write_to_file(char *, char *, char *);
+/**
+ * This function receives a Word (10-bit) unsigned
+ * integer and a pointer to a string to store the
+ * converted value and converts it to base 4
+ * representation string.
+ */
+void word_to_base4(Word, char *);
 
-int build_object_file(char *, unsigned int, unsigned int, MemoryUnit **, Label **);
+int code_and_data_size_base4_to_file(unsigned int, unsigned int, char *, char *);
+
+int write_full_content_to_file(char *, char *, char *);
+
+int build_object_file(char *, unsigned int, unsigned int, MemoryUnit **);
 int build_ext_file(char *, MemoryUnit **);
 int build_ent_file(char *, Label **);
 
