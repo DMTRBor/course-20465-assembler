@@ -17,13 +17,13 @@ MemoryUnit* new_mem_unit(void) {
 }
 
 
-void set_mem_unit_addresses(MemoryUnit **table, unsigned int start_address) {
-    MemoryUnit *current = *table;
-    unsigned int current_address = start_address;
-    
-    while (current != NULL) {
-        current->address = current_address++;
-        current = current->next;
+void set_mem_unit_addresses(MemoryUnit **mem_map, unsigned int start_address) {
+    MemoryUnit *unit = *mem_map;
+    unsigned int unit_address = start_address;
+
+    while (unit != NULL) {
+        unit->address = unit_address++;
+        unit = unit->next;
     }
 }
 
@@ -43,38 +43,38 @@ void set_word_fields(MemoryUnit *unit,
 }
 
 
-void add_mem_unit_to_table(MemoryUnit **table, MemoryUnit *new) {
-    MemoryUnit *current;
+void add_mem_unit_to_table(MemoryUnit **mem_map, MemoryUnit *new) {
+    MemoryUnit *unit;
     
-    if (table == NULL || new == NULL)
+    if (mem_map == NULL || new == NULL)
         return;
 
-    if (*table == NULL)
-        *table = new;
+    if (*mem_map == NULL)
+        *mem_map = new;
     else {
-        current = *table;
+        unit = *mem_map;
 
-        while (current->next != NULL)
-            current = current->next;
+        while (unit->next != NULL)
+            unit = unit->next;
 
-        current->next = new;
+        unit->next = new;
     }
 }
 
 
-void free_mem_table(MemoryUnit *table) {
-    MemoryUnit *current = table;
+void free_mem_table(MemoryUnit *mem_map) {
+    MemoryUnit *unit = mem_map;
     MemoryUnit *next;
-    
-    while (current != NULL) {
-        next = current->next;
-        free(current);
-        current = next;
+
+    while (unit != NULL) {
+        next = unit->next;
+        free(unit);
+        unit = next;
     }
 }
 
 
-void add_unit_and_increment_L(MemoryUnit **table, MemoryUnit *new, int *L) {
-    add_mem_unit_to_table(table, new);
+void add_unit_and_increment_L(MemoryUnit **mem_map, MemoryUnit *new, int *L) {
+    add_mem_unit_to_table(mem_map, new);
     (*L)++;
 }

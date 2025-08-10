@@ -75,7 +75,7 @@ int encode_matrix_row_col(Word *word, char *operand, int line_number) {
 }
 
 
-int encode_both_registers(MemoryUnit **table, char *line_arg, int line_number, int *L) {
+int encode_both_registers(MemoryUnit **mem_map, char *line_arg, int line_number, int *L) {
     MemoryUnit *new;
 
     /* validate first register */
@@ -105,13 +105,13 @@ int encode_both_registers(MemoryUnit **table, char *line_arg, int line_number, i
     encode_operand_sec_index(&new->encoded_value,
                             (unsigned int)strtoul(line_arg + 1, NULL, BASE_10));
     /* add new memory unit to table, increment words counter */
-    add_unit_and_increment_L(table, new, L);
+    add_unit_and_increment_L(mem_map, new, L);
 
     return STATUS_CODE_OK;  /* encoding succeeded */
 }
 
 
-int encode_directive_number(MemoryUnit **table, int number, int line_number, int *L) {
+int encode_directive_number(MemoryUnit **mem_map, int number, int line_number, int *L) {
     MemoryUnit *new;
 
     if ((new = new_mem_unit()) == NULL) {  /* allocate memory unit */
@@ -122,14 +122,14 @@ int encode_directive_number(MemoryUnit **table, int number, int line_number, int
     /* encode number value */
     encode_data_10_bit(&new->encoded_value, number);
     /* add new memory unit to table, increment words counter */
-    add_unit_and_increment_L(table, new, L);
+    add_unit_and_increment_L(mem_map, new, L);
 
     return STATUS_CODE_OK;
 }
 
 
-int encode_labels_addresses(MemoryUnit **mem, Label **labels) {
-    MemoryUnit *mem_unit = *mem;
+int encode_labels_addresses(MemoryUnit **mem_map, Label **labels) {
+    MemoryUnit *mem_unit = *mem_map;
     Label *label;
 
     while (mem_unit != NULL) {

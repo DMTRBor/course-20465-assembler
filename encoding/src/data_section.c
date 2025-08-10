@@ -1,7 +1,7 @@
 #include "../hdr/data_section.h"
 
 
-int encode_data_direc(char *line, MemoryUnit **table, int line_number) {
+int encode_data_direc(char *line, MemoryUnit **mem_map, int line_number) {
     char *line_arg, *line_copy;
     /* words and args counter */
     int L = 0, arg_id = 0, arg_val = MIN_10_BIT_VALUE;
@@ -18,7 +18,7 @@ int encode_data_direc(char *line, MemoryUnit **table, int line_number) {
                 return WORDS_NUM_ERROR;
             }
 
-            if (encode_directive_number(table, arg_val, line_number, &L) == STATUS_CODE_ERR) {
+            if (encode_directive_number(mem_map, arg_val, line_number, &L) == STATUS_CODE_ERR) {
                 free(line_copy);
                 return WORDS_NUM_ERROR;
             }
@@ -41,7 +41,7 @@ int encode_data_direc(char *line, MemoryUnit **table, int line_number) {
 }
 
 
-int encode_string_direc(char *line, MemoryUnit **table, int line_number) {
+int encode_string_direc(char *line, MemoryUnit **mem_map, int line_number) {
     char *line_arg, *line_copy;
     /* words and args counter */
     int L = 0, arg_id = 0, arg_ascii = 0, ch_id;
@@ -63,13 +63,13 @@ int encode_string_direc(char *line, MemoryUnit **table, int line_number) {
                 /* get character to ascii value */
                 arg_ascii = (int)line_arg[ch_id];
 
-                if (encode_directive_number(table, arg_ascii, line_number, &L) == STATUS_CODE_ERR) {
+                if (encode_directive_number(mem_map, arg_ascii, line_number, &L) == STATUS_CODE_ERR) {
                     free(line_copy);
                     return WORDS_NUM_ERROR;
                 }
             }
             /* encode null terminator */
-            if (encode_directive_number(table, NULL_TERMINATOR_ASCII,
+            if (encode_directive_number(mem_map, NULL_TERMINATOR_ASCII,
                                         line_number, &L) == STATUS_CODE_ERR) {
                 free(line_copy);
                 return WORDS_NUM_ERROR;
@@ -88,7 +88,7 @@ int encode_string_direc(char *line, MemoryUnit **table, int line_number) {
 }
 
 
-int encode_mat_direc(char *line, MemoryUnit **table, int line_number) {
+int encode_mat_direc(char *line, MemoryUnit **mem_map, int line_number) {
     char *line_arg, *line_copy, *mat_vals;
     /* words and args counter */
     int L = 0, arg_id = 0;
@@ -137,7 +137,7 @@ int encode_mat_direc(char *line, MemoryUnit **table, int line_number) {
                 else  /* no values were provided, allocate and fill with zeros */
                     val = 0;
 
-                if (encode_directive_number(table, val, line_number, &L) == STATUS_CODE_ERR) {
+                if (encode_directive_number(mem_map, val, line_number, &L) == STATUS_CODE_ERR) {
                     free(line_copy);
                     free(mat_vals);
                     return WORDS_NUM_ERROR;  /* encoding failed */

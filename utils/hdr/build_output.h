@@ -27,8 +27,10 @@
  */
 void decimal_to_base4(unsigned int, char *);
 
-void build_object_file(char *, unsigned int, unsigned int, MemoryUnit **, Label **);
-void build_ext_file(char *, Label **);
+int write_to_file(char *, char *, char *);
+
+int build_object_file(char *, unsigned int, unsigned int, MemoryUnit **, Label **);
+int build_ext_file(char *, MemoryUnit **);
 int build_ent_file(char *, Label **);
 
 #endif

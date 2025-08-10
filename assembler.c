@@ -50,18 +50,18 @@ int main(int argc, char *argv[])
             ic_value = IC_RESET_VALUE;
             dc_value = DC_RESET_VALUE;
 
-            MemoryUnit *mem = NULL;  /* memory map */
+            MemoryUnit *mem_map = NULL;  /* memory map */
             Label *labels = NULL;  /* labels map */
-    
-            if (run_first_pass(argv[arg_id], &ic_value, &dc_value, &mem, &labels) == STATUS_CODE_OK) {
+
+            if (run_first_pass(argv[arg_id], &ic_value, &dc_value, &mem_map, &labels) == STATUS_CODE_OK) {
                 fprintf(stdout, "Running second pass for: %s\n", filename);
                 /* second pass - using final IC and DC values */
-                run_second_pass(argv[arg_id], &ic_value, &dc_value, &mem, &labels);
+                run_second_pass(argv[arg_id], &ic_value, &dc_value, &mem_map, &labels);
             }
             
             /* clean used memory, if allocated */
-            if (mem != NULL)
-                free_mem_table(mem);
+            if (mem_map != NULL)
+                free_mem_table(mem_map);
             if (labels != NULL)
                 free_labels_table(labels);
         }

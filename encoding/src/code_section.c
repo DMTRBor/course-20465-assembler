@@ -1,7 +1,7 @@
 #include "../hdr/code_section.h"
 
 
-int encode_op_name(MemoryUnit **table,
+int encode_op_name(MemoryUnit **mem_map,
                    char *op_name,
                    unsigned int dest_operand,
                    unsigned int src_operand,
@@ -30,7 +30,7 @@ int encode_op_name(MemoryUnit **table,
                             src_operand,
                             opcode);
             /* add to table and count word */
-            add_unit_and_increment_L(table, new, L);
+            add_unit_and_increment_L(mem_map, new, L);
             
             return STATUS_CODE_OK;
         }
@@ -42,7 +42,7 @@ int encode_op_name(MemoryUnit **table,
 
 
 int encode_operand_by_type(char *operand, int is_src, unsigned int operand_type,
-                           int line_number, int *L, MemoryUnit **table) {
+                           int line_number, int *L, MemoryUnit **mem_map) {
     MemoryUnit *new;   /* for first word */
     MemoryUnit *new1;  /* for second word */
 
@@ -75,7 +75,7 @@ int encode_operand_by_type(char *operand, int is_src, unsigned int operand_type,
             /* no encoding at first pass - store label name */
             store_matrix_name(operand, &new->label_op_name);
             new->encoded_value.encoding_type = R;
-            add_unit_and_increment_L(table, new, L);
+            add_unit_and_increment_L(mem_map, new, L);
 
             /* encode row and col */
             if ((new1 = new_mem_unit()) == NULL) {  /* allocate another memory unit */
@@ -88,7 +88,7 @@ int encode_operand_by_type(char *operand, int is_src, unsigned int operand_type,
                 return STATUS_CODE_ERR;
             }
 
-            add_unit_and_increment_L(table, new1, L);
+            add_unit_and_increment_L(mem_map, new1, L);
             break;
         case REG:
             if (!is_register(operand)) {
@@ -114,7 +114,7 @@ int encode_operand_by_type(char *operand, int is_src, unsigned int operand_type,
     /* matrix addition to table done previously*/
     if (operand_type != MAT) {
         /* add new memory unit to table, increment words counter */
-        add_unit_and_increment_L(table, new, L);
+        add_unit_and_increment_L(mem_map, new, L);
     }
 
     return STATUS_CODE_OK;  /* encoding succeeded */
@@ -179,7 +179,7 @@ int encode_operands(MemoryUnit **table, char *op_line,
 
 int encode_instruction(char *op_line,
                        int num_of_operands,
-                       MemoryUnit **table,
+                       MemoryUnit **mem_map,
                        int line_number) {
     char *line_arg, *line_copy, *op_name;
     LineArg operand_type;
@@ -227,14 +227,14 @@ int encode_instruction(char *op_line,
     }
 
     /* encode operation name */
-    if (encode_op_name(table, op_name, dest_operand, src_operand, line_number, &L) == STATUS_CODE_ERR) {
+    if (encode_op_name(mem_map, op_name, dest_operand, src_operand, line_number, &L) == STATUS_CODE_ERR) {
         free(line_copy);
         free(op_name);
         return WORDS_NUM_ERROR;  /* encoding failed */
     }
 
     /* encode operands */
-    if (encode_operands(table, op_line, dest_operand,
+    if (encode_operands(mem_map, op_line, dest_operand,
                         src_operand, line_number, &L, num_of_operands) == STATUS_CODE_ERR) {
         free(line_copy);
         free(op_name);

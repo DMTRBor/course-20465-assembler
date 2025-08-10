@@ -2,7 +2,7 @@
 
 
 int run_first_pass(char *filename, unsigned int *IC, unsigned int *DC,
-                   MemoryUnit **mem, Label **labels) {
+                   MemoryUnit **mem_map, Label **labels) {
     int line_number = 1;
     int num_of_operands = 0;  /* number of operands for operation */
     int L = 0;  /* number of words occupied */
@@ -118,21 +118,21 @@ int run_first_pass(char *filename, unsigned int *IC, unsigned int *DC,
                 }
                 else if (is_expected_directive(curr_line->line, DATA_DIRECTIVE)) {
                     /* encode data with following args */
-                    if ((L = encode_data_direc(curr_line->line, mem, line_number)) == WORDS_NUM_ERROR) {
+                    if ((L = encode_data_direc(curr_line->line, mem_map, line_number)) == WORDS_NUM_ERROR) {
                         error_flag = TRUE;
                         break;
                     }
                 }
                 else if (is_expected_directive(curr_line->line, STRING_DIRECTIVE)) {
                     /* encode string with following args */
-                    if ((L = encode_string_direc(curr_line->line, mem, line_number)) == WORDS_NUM_ERROR) {
+                    if ((L = encode_string_direc(curr_line->line, mem_map, line_number)) == WORDS_NUM_ERROR) {
                         error_flag = TRUE;
                         break;
                     }
                 }
                 else if (is_expected_directive(curr_line->line, MAT_DIRECTIVE)) {
                     /* encode mat with following args */
-                    if ((L = encode_mat_direc(curr_line->line, mem, line_number)) == WORDS_NUM_ERROR) {
+                    if ((L = encode_mat_direc(curr_line->line, mem_map, line_number)) == WORDS_NUM_ERROR) {
                         error_flag = TRUE;
                         break;
                     }
@@ -163,7 +163,7 @@ int run_first_pass(char *filename, unsigned int *IC, unsigned int *DC,
 
                 /* encode operation and operands */
                 if ((L = encode_instruction(curr_line->line, num_of_operands,
-                                            mem, line_number)) == WORDS_NUM_ERROR) {
+                                            mem_map, line_number)) == WORDS_NUM_ERROR) {
                     error_flag = TRUE;
                     break;
                 }
@@ -196,7 +196,7 @@ int run_first_pass(char *filename, unsigned int *IC, unsigned int *DC,
     }
 
     /* update memory addresses for all units */
-    set_mem_unit_addresses(mem, IC_RESET_VALUE);
+    set_mem_unit_addresses(mem_map, IC_RESET_VALUE);
 
     free_list(curr_line);  /* free lines list */
     return STATUS_CODE_OK;

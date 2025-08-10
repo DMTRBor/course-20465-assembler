@@ -2,8 +2,11 @@
 
 
 int run_second_pass(char *filename, unsigned int *IC, unsigned int *DC,
-                    MemoryUnit **mem, Label **labels) {
+                    MemoryUnit **mem_map, Label **labels) {
     int line_number = 1;
+
+    int has_entries = FALSE;  /* flag to check if any entry labels exist */
+    int has_externs = FALSE;  /* flag to check if any external labels exist */
 
     /* use error cheking for content of .am file */
     int error_flag = FALSE;
@@ -55,6 +58,7 @@ int run_second_pass(char *filename, unsigned int *IC, unsigned int *DC,
             case DIRECTIVE:
                 /* entry detected */
                 if (is_expected_directive(curr_line->line, ENTRY_DIRECTIVE)) {
+                    has_entries = TRUE;  /* set entry flag */
                     /* extract label name */
                     label_name = strchr(curr_line->line, WHITESPACE_CHAR);
                     /* skip whitespaces */
@@ -70,8 +74,10 @@ int run_second_pass(char *filename, unsigned int *IC, unsigned int *DC,
                     /* change label type to ENTRY */
                     set_label_type(labels, label_name, ENTRY);
                 }
-                /* skip data, string, mat and extern */
-                break;
+                else if (is_expected_directive(curr_line->line, EXTERNAL_DIRECTIVE))
+                    has_externs = TRUE;  /* set extern flag */
+
+                break;  /* skip data, string, mat and extern */
 
             default:
                 fprintf(stderr, "Argument error in line %d: unrecognized argument - %s\n",
@@ -90,19 +96,22 @@ int run_second_pass(char *filename, unsigned int *IC, unsigned int *DC,
         return STATUS_CODE_ERR;
     }
 
-    /* encode labels */
-    if (encode_labels_addresses(mem, labels) != STATUS_CODE_OK) {
+    /* encode labels in memory table */
+    if (encode_labels_addresses(mem_map, labels) != STATUS_CODE_OK) {
         free_list(curr_line);  /* failed - free lines list */
         return STATUS_CODE_ERR;
     }
 
     /* build output files */
     /* object file */
-    build_object_file(filename, *IC, *DC, mem, labels);
-    /* ext file */
-    build_ext_file(filename, labels);
-    /* entry file */
-    if (build_ent_file(filename, labels) != STATUS_CODE_OK) {
+    build_object_file(filename, *IC, *DC, mem_map, labels);
+    /* ext file - create only if extern labels exist */
+    if (has_externs && (build_ext_file(filename, mem_map) != STATUS_CODE_OK)) {
+        free_list(curr_line);  /* failed - free lines list */
+        return STATUS_CODE_ERR;
+    }
+    /* entry file - create only if entry labels exist */
+    if (has_entries && (build_ent_file(filename, labels) != STATUS_CODE_OK)) {
         free_list(curr_line);  /* failed - free lines list */
         return STATUS_CODE_ERR;
     }
