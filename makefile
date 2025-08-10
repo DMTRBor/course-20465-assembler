@@ -1,81 +1,63 @@
-# Compiler and flags
+# compiler and flags
 CC = gcc
 CFLAGS = -Wall -ansi -pedantic -g
 
-# Directories
-DATA_STRUCTS_SRC = data_structs/src
-DATA_STRUCTS_HDR = data_structs/hdr
-ENCODING_SRC = encoding/src
-ENCODING_HDR = encoding/hdr
-MACHINE_SRC = machine/src
-MACHINE_HDR = machine/hdr
-PROCESSING_SRC = processing/src
-PROCESSING_HDR = processing/hdr
-UTILS_SRC = utils/src
-UTILS_HDR = utils/hdr
+# include headers
+INCLUDES = -Idata_structs/hdr -Iencoding/hdr -Imachine/hdr -Iprocessing/hdr -Iutils/hdr
 
-# Include directories
-INCLUDES = -I$(DATA_STRUCTS_HDR) -I$(ENCODING_HDR) -I$(MACHINE_HDR) -I$(PROCESSING_HDR) -I$(UTILS_HDR)
-
-# Source files
+# source files
 SOURCES = assembler.c \
-          $(DATA_STRUCTS_SRC)/memory_table.c \
-          $(DATA_STRUCTS_SRC)/macro_list.c \
-          $(DATA_STRUCTS_SRC)/lines_list.c \
-          $(DATA_STRUCTS_SRC)/labels_table.c \
-          $(ENCODING_SRC)/util.c \
-          $(ENCODING_SRC)/data_section.c \
-          $(ENCODING_SRC)/code_section.c \
-          $(MACHINE_SRC)/machine.c \
-          $(PROCESSING_SRC)/pre_assembler.c \
-          $(PROCESSING_SRC)/first_pass.c \
-          $(PROCESSING_SRC)/second_pass.c \
-          $(UTILS_SRC)/utils.c \
-          $(UTILS_SRC)/errors_handling.c \
-          $(UTILS_SRC)/build_output.c
+          data_structs/src/memory_table.c \
+          data_structs/src/macro_list.c \
+          data_structs/src/lines_list.c \
+          data_structs/src/labels_table.c \
+          encoding/src/util.c \
+          encoding/src/data_section.c \
+          encoding/src/code_section.c \
+          machine/src/machine.c \
+          processing/src/pre_assembler.c \
+          processing/src/first_pass.c \
+          processing/src/second_pass.c \
+          utils/src/utils.c \
+          utils/src/errors_handling.c \
+          utils/src/build_output.c
 
-# Object files
+# object files
 OBJECTS = $(SOURCES:.c=.o)
 
-# Target executable
-TARGET = assembler
+# executable
+EXEC = assembler
 
-# Default target
-all: $(TARGET)
-
-# Build the executable
-$(TARGET): $(OBJECTS)
+# build executable
+$(EXEC): $(OBJECTS)
 	$(CC) $(CFLAGS) -o $@ $^ -lm
 
-# Compile source files to object files
+# compile source files to object files
 %.o: %.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-# Clean build files
+# remove files on rebuild
 clean:
-	rm -f $(OBJECTS) $(TARGET) *.am *.ob *.ent *.ext
+	rm -rf $(OBJECTS) $(EXEC) *.am *.ob *.ent *.ext
 
-# Phony targets
-.PHONY: all clean
+# add dependencies
+assembler.o: assembler.c processing/hdr/pre_assembler.h processing/hdr/first_pass.h processing/hdr/second_pass.h
 
-# Dependencies
-assembler.o: assembler.c $(PROCESSING_HDR)/pre_assembler.h $(PROCESSING_HDR)/first_pass.h $(PROCESSING_HDR)/second_pass.h
+data_structs/src/memory_table.o: data_structs/src/memory_table.c data_structs/hdr/mem_unit.h
+data_structs/src/macro_list.o: data_structs/src/macro_list.c data_structs/hdr/macro.h
+data_structs/src/lines_list.o: data_structs/src/lines_list.c data_structs/hdr/line.h
+data_structs/src/labels_table.o: data_structs/src/labels_table.c data_structs/hdr/label.h
 
-$(DATA_STRUCTS_SRC)/memory_table.o: $(DATA_STRUCTS_SRC)/memory_table.c $(DATA_STRUCTS_HDR)/mem_unit.h
-$(DATA_STRUCTS_SRC)/macro_list.o: $(DATA_STRUCTS_SRC)/macro_list.c $(DATA_STRUCTS_HDR)/macro.h
-$(DATA_STRUCTS_SRC)/lines_list.o: $(DATA_STRUCTS_SRC)/lines_list.c $(DATA_STRUCTS_HDR)/line.h
-$(DATA_STRUCTS_SRC)/labels_table.o: $(DATA_STRUCTS_SRC)/labels_table.c $(DATA_STRUCTS_HDR)/label.h
+encoding/src/util.o: encoding/src/util.c encoding/hdr/util.h
+encoding/src/data_section.o: encoding/src/data_section.c encoding/hdr/data_section.h
+encoding/src/code_section.o: encoding/src/code_section.c encoding/hdr/code_section.h
 
-$(ENCODING_SRC)/util.o: $(ENCODING_SRC)/util.c $(ENCODING_HDR)/util.h
-$(ENCODING_SRC)/data_section.o: $(ENCODING_SRC)/data_section.c $(ENCODING_HDR)/data_section.h
-$(ENCODING_SRC)/code_section.o: $(ENCODING_SRC)/code_section.c $(ENCODING_HDR)/code_section.h
+machine/src/machine.o: machine/src/machine.c machine/hdr/machine.h
 
-$(MACHINE_SRC)/machine.o: $(MACHINE_SRC)/machine.c $(MACHINE_HDR)/machine.h
+processing/src/pre_assembler.o: processing/src/pre_assembler.c processing/hdr/pre_assembler.h
+processing/src/first_pass.o: processing/src/first_pass.c processing/hdr/first_pass.h
+processing/src/second_pass.o: processing/src/second_pass.c processing/hdr/second_pass.h
 
-$(PROCESSING_SRC)/pre_assembler.o: $(PROCESSING_SRC)/pre_assembler.c $(PROCESSING_HDR)/pre_assembler.h
-$(PROCESSING_SRC)/first_pass.o: $(PROCESSING_SRC)/first_pass.c $(PROCESSING_HDR)/first_pass.h
-$(PROCESSING_SRC)/second_pass.o: $(PROCESSING_SRC)/second_pass.c $(PROCESSING_HDR)/second_pass.h
-
-$(UTILS_SRC)/utils.o: $(UTILS_SRC)/utils.c $(UTILS_HDR)/utils.h
-$(UTILS_SRC)/errors_handling.o: $(UTILS_SRC)/errors_handling.c $(UTILS_HDR)/errors_handling.h
-$(UTILS_SRC)/build_output.o: $(UTILS_SRC)/build_output.c $(UTILS_HDR)/build_output.h
+data_structs/src/utils.o: data_structs/src/utils.c data_structs/hdr/utils.h
+data_structs/src/errors_handling.o: data_structs/src/errors_handling.c data_structs/hdr/errors_handling.h
+data_structs/src/build_output.o: data_structs/src/build_output.c data_structs/hdr/build_output.h
