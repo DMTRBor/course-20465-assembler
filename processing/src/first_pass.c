@@ -61,7 +61,7 @@ int run_first_pass(char *filename, unsigned int *IC, unsigned int *DC,
                 
                 /* detect label type */
                 if (is_extern) {
-                    label->name = curr_line->line;  /* label coming from extern directive */
+                    label->name = strdup(curr_line->line);  /* label coming from extern directive */
                     set_label_fields(label, EXTERNAL, EXTERN_LABEL_ADDRESS);
                 }
                 else  /* set new label name */
@@ -70,14 +70,12 @@ int run_first_pass(char *filename, unsigned int *IC, unsigned int *DC,
                 /* check if label already exists */
                 if (is_label_exists(labels, label->name)) {
                     fprintf(stderr, "Label '%s' from line %d already exists\n", label->name, line_number);
-                    free(label);
                     error_flag = TRUE;
                 }
 
                 /* new label detected - add to table */
                 if (add_label_to_table(labels, label) == STATUS_CODE_ERR) {
                     fprintf(stderr, "Failed to add label '%s' to list at line %d\n", label->name, line_number);
-                    free(label);
                     error_flag = TRUE;
                 }
 
