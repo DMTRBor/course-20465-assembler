@@ -50,3 +50,13 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+.vscode/
+assembler
+artifacts
+
+# Exclude assembler artifacts
+*.ob
+*.am
+*.ent
+*.ext
